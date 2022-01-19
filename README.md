@@ -1,3 +1,9 @@
 # my-awesome-compiler
 
-## hi mom ❤️
+Hi mom ❤️
+
+
+Social Media
+===
+
+Follow me on GitHub [@caschultze](https://github.com/caschultze)
