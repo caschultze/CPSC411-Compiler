@@ -10,6 +10,8 @@ class JMinusMinusFlexLexer : public yyFlexLexer {
     public:
         JMinusMinusFlexLexer(istream *in) : yyFlexLexer(in) { yylineno = 1;}
         int yylex();
+        string lexeme;
+
 };
 
 enum {

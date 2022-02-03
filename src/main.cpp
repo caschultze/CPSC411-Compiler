@@ -28,13 +28,16 @@ int main(int argc, char *argv[]) {
    }
    
    auto lexer = make_unique<JMinusMinusFlexLexer>(&source);
-
+   // lexer->lexeme = "ab";
+   // lexer->lexeme.push_back('\0');
+   // lexer->lexeme.push_back('c');
+   // lexer->lexeme.push_back('d');
    int token;
    while ((token = lexer->yylex()) != 0) {
       std::cout << 
       "Token: "    << getName(token) << 
       "\nLine: "   << lexer->lineno() <<
-      "\nLexeme: " << lexer->YYText() << "\n\n";
+      "\nLexeme: " << lexer->lexeme << "\n\n";
    }
 
    source.close();
