@@ -69,8 +69,7 @@ WHITESPACE  [ \t\n\r\f\v]+
                                   }
 <STRING>\n                        {cerr << "error: newline in string at line " << yylineno << endl;}
 <STRING>\\(\"|\b|\f|\t|\r|\n|\\)  {yymore();}
-
-<STRING>\0        {std::cout << std::string(YYText()) << std::endl; yymore();}
+<STRING>\0        { putchar(YYText()[2]); yymore(); }
 <STRING>.         {yymore();}
 <STRING><<EOF>>   {cerr << "error: string missing closing quote at line " << yylineno << endl; return 0;}
 

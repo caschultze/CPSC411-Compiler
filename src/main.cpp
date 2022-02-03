@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
    while ((token = lexer->yylex()) != 0) {
       std::cout << 
       "Token: "    << getName(token) << 
-      "\nLine: "   << lexer->lineno()   <<
-      "\nLexeme: " << lexer->YYText()   << "\n\n";
+      "\nLine: "   << lexer->lineno() <<
+      "\nLexeme: " << lexer->YYText() << "\n\n";
    }
 
    source.close();
