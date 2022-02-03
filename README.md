@@ -2,6 +2,9 @@
 
 Hi mom ❤️
 
+To run this program, please use the following commands:
+make
+./main <j-- source code>
 
 Social Media
 ===
