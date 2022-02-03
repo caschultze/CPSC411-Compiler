@@ -19,62 +19,57 @@ WHITESPACE  [ \t\n\r\f\v]+
 
 %%
 
-\"                  { yymore(); BEGIN(STRING); }
-{NUMBER}            { lexeme = string(YYText()); return T_NUMBER; }  
+\"                  { /*yymore();*/ BEGIN(STRING); }
+{NUMBER}            { return T_NUMBER; }  
 
-"//"                {yymore(); BEGIN(COMMENT);}
+"//"                { yymore(); BEGIN(COMMENT);}
 
-"true"              { lexeme = string(YYText()); return T_TRUE; }
-"false"             { lexeme = string(YYText()); return T_FALSE; }
-"boolean"           { lexeme = string(YYText()); return T_BOOLEAN; }
-"int"               { lexeme = string(YYText()); return T_INT; }
-"void"              { lexeme = string(YYText()); return T_VOID; }
-"if"                { lexeme = string(YYText()); return T_IF; }
-"else"              { lexeme = string(YYText()); return T_ELSE; }
-"while"             { lexeme = string(YYText()); return T_WHILE; }
-"break"             { lexeme = string(YYText()); return T_BREAK; }
-"return"            { lexeme = string(YYText()); return T_RETURN; }
+"true"              { return T_TRUE; }
+"false"             { return T_FALSE; }
+"boolean"           { return T_BOOLEAN; }
+"int"               { return T_INT; }
+"void"              { return T_VOID; }
+"if"                { return T_IF; }
+"else"              { return T_ELSE; }
+"while"             { return T_WHILE; }
+"break"             { return T_BREAK; }
+"return"            { return T_RETURN; }
 
-"+"                 { lexeme = string(YYText()); return T_ADD; }
-"-"                 { lexeme = string(YYText()); return T_SUB; }
-"*"                 { lexeme = string(YYText()); return T_MUL; }
-"/"                 { lexeme = string(YYText()); return T_DIV; }
-"%"                 { lexeme = string(YYText()); return T_MOD; }
-"<"                 { lexeme = string(YYText()); return T_LT; }
-">"                 { lexeme = string(YYText()); return T_GT; }
-"<="                { lexeme = string(YYText()); return T_LE; }
-">="                { lexeme = string(YYText()); return T_GE; }
-"="                 { lexeme = string(YYText()); return T_EQ; }
-"=="                { lexeme = string(YYText()); return T_EQUIV; }
-"!="                { lexeme = string(YYText()); return T_NEQUIV; }
-"!"                 { lexeme = string(YYText()); return T_NOT; }
-"&&"                { lexeme = string(YYText()); return T_AND; }
-"||"                { lexeme = string(YYText()); return T_OR; }
+"+"                 { return T_ADD; }
+"-"                 { return T_SUB; }
+"*"                 { return T_MUL; }
+"/"                 { return T_DIV; }
+"%"                 { return T_MOD; }
+"<"                 { return T_LT; }
+">"                 { return T_GT; }
+"<="                { return T_LE; }
+">="                { return T_GE; }
+"="                 { return T_EQ; }
+"=="                { return T_EQUIV; }
+"!="                { return T_NEQUIV; }
+"!"                 { return T_NOT; }
+"&&"                { return T_AND; }
+"||"                { return T_OR; }
 
-"("                 { lexeme = string(YYText()); return T_LBRACKET;}
-")"                 { lexeme = string(YYText()); return T_RBRACKET;}
-"{"                 { lexeme = string(YYText()); return T_LBRACE;}
-"}"                 { lexeme = string(YYText()); return T_RBRACE;}
-";"                 { lexeme = string(YYText()); return T_SEMICOLON;}
-","                 { lexeme = string(YYText()); return T_COMMA;}
+"("                 { return T_LBRACKET;}
+")"                 { return T_RBRACKET;}
+"{"                 { return T_LBRACE;}
+"}"                 { return T_RBRACE;}
+";"                 { return T_SEMICOLON;}
+","                 { return T_COMMA;}
 
 {WHITESPACE}        { ; }
      
-{ID}                { lexeme = string(YYText()); return T_ID; }
+{ID}                {  return T_ID; }
 
-<STRING>\"        {
-                      BEGIN(INITIAL); 
-                      lexeme = string(YYText()); 
-                      return T_STRING;
-                  }
-<STRING>\n        {cerr << "error: newline in string at line " << yylineno << endl;}
-<STRING>\\\b      {yymore();}
-<STRING>\\\f      {yymore();}
-<STRING>\\\t      {yymore();}
-<STRING>\\\r      {yymore();}
-<STRING>\\\n      {yymore();}
-<STRING>\\\"      {yymore();}
-<STRING>\\\\      {yymore();}
+<STRING>\"                        {
+                                    BEGIN(INITIAL); 
+
+                                    return T_STRING;
+                                  }
+<STRING>\n                        {cerr << "error: newline in string at line " << yylineno << endl;}
+<STRING>\\(\"|\b|\f|\t|\r|\n|\\)  {yymore();}
+
 <STRING>\0        {std::cout << std::string(YYText()) << std::endl; yymore();}
 <STRING>.         {yymore();}
 <STRING><<EOF>>   {cerr << "error: string missing closing quote at line " << yylineno << endl; return 0;}
@@ -84,7 +79,6 @@ WHITESPACE  [ \t\n\r\f\v]+
 <COMMENT>.        {;}
 <COMMENT><<EOF>>  {return 0;}
 
-.                   cerr << "warning: invalid character at line " << yylineno << endl;
-
+.                 cerr << "Warning: invalid character at line " << yylineno << endl;
 
 %%
