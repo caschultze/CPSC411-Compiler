@@ -56,7 +56,7 @@ WHITESPACE          [ \t\r\n\f\v]+
 {WHITESPACE}        { ; }
 
 "//"                { BEGIN(COMMENT); }
-<COMMENT>\r|\n      { BEGIN(INITIAL);}
+<COMMENT>(\r|\n)+   { BEGIN(INITIAL);}
 <COMMENT>.          { ; }
 <COMMENT><<EOF>>    { return 0; }
 
@@ -73,6 +73,7 @@ WHITESPACE          [ \t\r\n\f\v]+
 <STRING>\\(\"|\b|\f|\t|\r|\n|\\) {
                       lexeme.push_back(YYText()[YYLeng()-2]);
                       lexeme.push_back(YYText()[YYLeng()-1]);
+                      //cout << "debug: " << yylineno << endl;
                       yymore();
                     }
 <STRING>\0          {
@@ -84,8 +85,8 @@ WHITESPACE          [ \t\r\n\f\v]+
                       lexeme.push_back(YYText()[YYLeng()-1]);
                       yymore(); 
                     }
-<STRING>[\n|\r]+    {
-                      cerr << "Error: string missing closing quote at line " << yylineno << endl;
+<STRING>(\r|\n)+    {
+                      cerr << "Error: newline inside string at line " << yylineno-1 << endl;
                       return 0;
                     }
 <STRING><<EOF>>     {

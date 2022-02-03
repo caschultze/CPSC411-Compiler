@@ -11,7 +11,6 @@ class JMinusMinusFlexLexer : public yyFlexLexer {
         JMinusMinusFlexLexer(istream *in) : yyFlexLexer(in) { yylineno = 1;}
         int yylex();
         string lexeme;
-
 };
 
 enum {
@@ -48,7 +47,10 @@ enum {
     T_LBRACE,
     T_RBRACE,
     T_SEMICOLON,
-    T_COMMA
+    T_COMMA,
+    T_WARNING1,
+    T_ERROR1,
+    T_ERROR2
 };
 
 inline char const* getName (int tok){
@@ -155,6 +157,9 @@ inline char const* getName (int tok){
 
         case T_COMMA:
             return ",";
+
+        case T_WARNING1:
+            return "";
 
         default:
             return "???";
