@@ -7,21 +7,16 @@
 using namespace std;
 
 class Token {
-   
-   public:
-      string type, lexeme;
+   private:
+      string type;
       int line;
-      Token(string ty, int li) : type (ty), line (li), lexeme (ty) {};
+      string lexeme;
+   public:
       Token(string ty, int li, string le) : type (ty), line (li), lexeme (le) {};
-      string asdf();
+      string toString();
 };
 
-// string Token::asdf() {
-//    std::stringstream ss;
-//    ss << "\nToken: " << type << "\nLine: " << line << "\nLexeme: " << lexeme;
-//    string result = ss.str();
-//    return result;
-// }
-
-
+string Token::toString() {
+   return "Token(" + type + ", " + to_string(line) + ", " + lexeme + ")";
+}
 #endif

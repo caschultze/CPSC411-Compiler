@@ -1,38 +1,48 @@
-#include <FlexLexer.h>
-#include "scanner.hpp"
 #include <iostream>
 #include <fstream>
 #include <memory>
 #include <cerrno>
 #include <cstring>
-
+#include <vector>
+#include <FlexLexer.h>
+#include "error_handler.hpp"
+#include "token.hpp"
+#include "scanner.hpp"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
    
    if (argc != 2) {
-      cerr << "\x1B[1;31mError: \x1B[0mExpected one argument" << endl;
-      exit(EXIT_FAILURE);
-      //error(2);
+      error(ERROR_BADARGS);
    }
 
    ifstream source;
    source.open(argv[1]);
 
    if (!source.is_open()) {
-      cerr << "\x1B[1;31mError: \x1B[0mFile could not be opened" << endl;
-      exit(EXIT_FAILURE);
-      //error(3);
+      error(ERROR_BADFILE);
    }
    
    auto lexer = make_unique<JMinusMinusFlexLexer>(&source);
-   int token;
-   while ((token = lexer->yylex()) != 0) {
-      cout << 
-      "Token: "    << getName(token) << 
-      "\nLine: "   << lexer->lineno() <<
-      "\nLexeme: " << lexer->lexeme << "\n\n";
+
+   int tok;
+   while ((tok = lexer->yylex()) != 0) {
+      
+      if (tok == T_WARNING_BADCHAR) { 
+         warning(LEX_WARNING_INVALIDCHAR, to_string(lexer->lineno()) ); 
+         continue; 
+      }
+      if (tok == T_ERROR_NEWLINESTR) { 
+         error( LEX_ERROR_NEWLINESTR, to_string(lexer->lineno()) ); 
+      }
+      if (tok == T_ERROR_EOFSTR) {
+         error(LEX_ERROR_EOFSTR, to_string(lexer->lineno()));
+      }
+      
+      cout << "Token(" + string(getType(tok)) + ", " 
+         + to_string(lexer->lineno()) + ", " 
+         + string(lexer->lexeme) + ")" << endl;
    }
 
    source.close();

@@ -85,15 +85,9 @@ WHITESPACE          [ \t\r\n\f\v]+
                       lexeme.push_back(YYText()[YYLeng()-1]);
                       yymore(); 
                     }
-<STRING>(\r|\n)+    {
-                      cerr << "Error: newline inside string at line " << yylineno-1 << endl;
-                      return 0;
-                    }
-<STRING><<EOF>>     {
-                      cerr << "Error: string missing closing quote at line " << yylineno << endl; 
-                      return 0;
-                    }
+<STRING>(\r|\n)+    { return T_ERROR_NEWLINESTR; }
+<STRING><<EOF>>     { return T_ERROR_EOFSTR; }
 
-.                   { cerr << "Warning: invalid character at line " << yylineno << endl; }
-
+.                   { return T_WARNING_BADCHAR; }
+<<EOF>>             { return 0; }
 %%
