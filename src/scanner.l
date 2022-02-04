@@ -4,8 +4,6 @@
 %option yylineno
 
 %{
-  #include <iostream>
-  #include <fstream>
   #include "scanner.hpp"
 
   using namespace std;

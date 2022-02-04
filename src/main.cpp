@@ -1,12 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <cerrno>
-#include <cstring>
-#include <vector>
 #include <FlexLexer.h>
 #include "error_handler.hpp"
-#include "token.hpp"
 #include "scanner.hpp"
 
 using namespace std;
@@ -40,9 +36,9 @@ int main(int argc, char *argv[]) {
          error(LEX_ERROR_EOFSTR, to_string(lexer->lineno()));
       }
       
-      cout << "Token(" + string(getType(tok)) + ", " 
-         + to_string(lexer->lineno()) + ", " 
-         + string(lexer->lexeme) + ")" << endl;
+      cout << "Token("  + string(getType(tok)) + ", " 
+                        + to_string(lexer->lineno()) + ", " 
+                        + string(lexer->lexeme) + ")" << endl;
    }
 
    source.close();

@@ -1,9 +1,6 @@
 #ifndef SCANNER_HPP
 #define SCANNER_HPP
 
-#include <iostream>
-#include <fstream>
-
 using namespace std;
 
 class JMinusMinusFlexLexer : public yyFlexLexer {
@@ -11,14 +8,6 @@ class JMinusMinusFlexLexer : public yyFlexLexer {
         JMinusMinusFlexLexer(istream *in) : yyFlexLexer(in) { yylineno = 1;}
         int yylex();
         string lexeme;
-
-        struct Error;
-
-};
-
-struct JMinusMinusFlexLexer::Error {
-    int type;
-    string details;
 };
 
 enum {
