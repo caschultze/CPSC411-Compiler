@@ -19,13 +19,13 @@ int error(int code, string details = "")
     switch (code)
     {
         case ERROR_TOOMANYWARNINGS:
-            cerr << "\x1B[1;31mError: \x1B[0mToo many warnings, aborting process." << endl;
+            cerr << "\x1B[1;31mError: \x1B[0mtoo many warnings, aborting process." << endl;
             exit(EXIT_FAILURE);
         case ERROR_BADARGS:
-            cerr << "\x1B[1;31mError: \x1B[0mExpected one argument" << endl;
+            cerr << "\x1B[1;31mError: \x1B[0mexpected one argument" << endl;
             exit(EXIT_FAILURE);
         case ERROR_BADFILE:
-            cerr << "\x1B[1;31mError: \x1B[0mFile could not be opened" << endl;
+            cerr << "\x1B[1;31mError: \x1B[0mcannot not open file: " << details << endl;
             exit(EXIT_FAILURE);
         case LEX_ERROR_NEWLINESTR:
             cerr << "\x1B[1;31mError: \x1B[0mnewline inside string at line " << details << endl;
@@ -39,6 +39,7 @@ int error(int code, string details = "")
     }
 }
 
+// Track the number of warnings.
 int warningno = 0;
 
 void warning(int code, string details = "")

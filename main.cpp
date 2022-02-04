@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
    source.open(argv[1]);
 
    if (!source.is_open()) {
-      error(ERROR_BADFILE);
+      error(ERROR_BADFILE, argv[1]);
    }
    
    auto lexer = make_unique<JMinusMinusFlexLexer>(&source);
@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
    int tok;
    while ((tok = lexer->yylex()) != 0) {
       
+      // Handle the warning and error tokens.
       if (tok == T_WARNING_BADCHAR) { 
          warning(LEX_WARNING_INVALIDCHAR, to_string(lexer->lineno()) ); 
          continue; 

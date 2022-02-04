@@ -156,7 +156,8 @@ inline char const* getType (int tok){
             return ",";
 
         default:
-            return "???";
+            // Should never happen
+            return "unknown token type";
         }
 }
 

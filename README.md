@@ -14,5 +14,4 @@ To compile and run this program, execute:
 
 To compile and run the program repeatedly on a directory, execute:
 
-
     ./scanner.sh
