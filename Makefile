@@ -1,10 +1,10 @@
 all: flex scanner
 
-flex: scanner.l
-	flex --c++ scanner.l
+flex: scanner.flex
+	flex --c++ scanner.flex
 
 scanner: scanner.hpp lex.yy.cc main.cpp
 	g++ -Wall -o main lex.yy.cc main.cpp
 
 clean:
-	rm -rf *.yy.cc main
+	rm -rf main lex.yy.cc

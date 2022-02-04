@@ -1,12 +1,18 @@
-# my-awesome-compiler
+# J--_Compiler
 
-Hi mom ❤️
+This project contains the Scanner component of the CPSC411 J-- compiler project.
 
-To run this program, please use the following commands:
-make
-./main <j-- source code>
 
-Social Media
-===
+To compile and run this program, execute:
 
-Follow me on GitHub [@caschultze](https://github.com/caschultze)
+    make
+    ./main \<test file>
+
+
+
+
+
+To compile and run the program repeatedly on a directory, execute:
+
+    make
+    ./scanner.sh

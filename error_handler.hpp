@@ -14,7 +14,7 @@ enum {
     LEX_WARNING_INVALIDCHAR
 };
 
-inline int error(int code, string details = "")
+int error(int code, string details = "")
 {
     switch (code)
     {
@@ -41,7 +41,7 @@ inline int error(int code, string details = "")
 
 int warningno = 0;
 
-inline void warning(int code, string details = "")
+void warning(int code, string details = "")
 {
     switch (code)
     {
