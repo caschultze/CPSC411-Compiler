@@ -22,7 +22,7 @@ int error(int code, string details = "")
             cerr << "\x1B[1;31mError: \x1B[0mtoo many warnings, aborting process." << endl;
             exit(EXIT_FAILURE);
         case ERROR_BADARGS:
-            cerr << "\x1B[1;31mError: \x1B[0mexpected one argument - usage: ./main <file>" << endl;
+            cerr << "\x1B[1;31mError: \x1B[0mexpected one argument -  usage: ./main <file>" << endl;
             exit(EXIT_FAILURE);
         case ERROR_BADFILE:
             cerr << "\x1B[1;31mError: \x1B[0mcannot not open file: " << details << endl;
