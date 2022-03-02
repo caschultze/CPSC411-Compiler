@@ -1,0 +1,2 @@
+// Purpose:
+// Test if the parser generates AST with just the 'program' root node.

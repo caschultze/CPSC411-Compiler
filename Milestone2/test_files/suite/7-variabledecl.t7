@@ -1,1 +1,4 @@
+// Purpose:
+// Test global variable declartion
+
 int a;

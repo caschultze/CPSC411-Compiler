@@ -1,12 +1,16 @@
+// Purpose:
+// Test simple statements within a main function.
+
 main() {
     int a;
     boolean b;
     
-    // TODO: statementexpression ;
     break;
-    // TODO: RETURN expression ;
     return;
-    // TODO: if ( expression ) statement
-    // TODO: if ( expression ) statement else statement
-    // TODO while ( expression ) statement
+
+    if (a == b) print(a);
+
+    if (a > b) print(a); else print(b);
+
+    while (a > b) b = b + 1;
 }

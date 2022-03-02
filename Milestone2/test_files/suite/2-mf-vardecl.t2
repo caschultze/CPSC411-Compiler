@@ -1,3 +1,6 @@
+// Purpose:
+// Test variable declarations within a main function
+
 main() { 
     boolean a;
     int b; 

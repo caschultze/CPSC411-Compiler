@@ -15,7 +15,14 @@
 %define api.namespace {JMMC}
 %define api.parser.class {JMMParser}
 
-/* enable location tracking */
+/* 
+    enable location tracking 
+    
+    note:
+    I couldn't get location tracking figured out, so this parser is limited
+    such that it has bad error messages and the AST does not include line numbers
+    for nodes.
+*/
 %locations                              
 
 /* add dependencies */

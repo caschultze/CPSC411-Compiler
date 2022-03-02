@@ -1,3 +1,6 @@
+// Purpose:
+// Test function declarations
+
 void ungetc(int ch, boolean b)
 {
 	if (_havechar) {
