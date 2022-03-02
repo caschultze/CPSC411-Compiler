@@ -1,0 +1,9 @@
+void ungetc(int ch, boolean b)
+{
+	if (_havechar) {
+		prints("Internal error: too many ungets!\n");
+		halt();
+	}
+	_havechar = true;
+	_char = ch;
+}

@@ -1,0 +1,4 @@
+main() { 
+    boolean a;
+    int b; 
+}

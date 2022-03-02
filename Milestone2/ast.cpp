@@ -3,30 +3,54 @@
 
 using namespace std;
 
-ASTNode::ASTNode()
-{
-    // cout << "ASTNode constructor: hello" << endl;
+ASTNode::ASTNode() {
+    lineno = 0;
 }
 
-ASTNode::~ASTNode() 
-{
-    // cout << "hi ASTNode destructor: hello" << endl;
+ASTNode::~ASTNode() {
+    ;
 }
 
-void ASTNode::print()
-{
-    cout << "ASTNode print: hello" << endl;
-}
+// Print contents of ASTNode.
+void ASTNode::print() {
+    int num_tabs = 0;
+    if (type != "")
+    {
+        cout << type  << " {'type': '" << type << "'";
 
-void DeclarationNode::print()
-{
-    cout << type << " {'type': '" << type << "'}" << endl;
-    for (auto x : children) {
-        x.print();
+        if (lineno > 0){
+            cout << ", 'lineno': '" << lineno << "'";
+        }
+        
+        if (attr != "") {
+             cout << ", 'attr': '" << attr << "'";
+        }
+        cout << "}" << endl;
+
+        for (auto x : children) {
+            x.print(num_tabs+1);
+        }
     }
-};
+}
 
-void LeafNode::print()
+// Print contents of ASTNode, preceeded by num_tabs instances of '\t'.
+void ASTNode::print(int num_tabs)
 {
-    cout << type << " {'type': '" << type << "', 'attr': '" << attr << "'}" << endl;
-};
+    if (type != "")
+    {
+        for (int i = 0; i < num_tabs; i++)
+            cout << '\t';
+
+        cout << type  << " {'type': '" << type << "'";
+        
+        if (attr != "") {
+             cout << ", 'attr': '" << attr << "'";
+        }
+
+        cout << "}" << endl;
+
+        for (auto x : children) {
+            x.print(num_tabs+1);
+        }
+    }
+}

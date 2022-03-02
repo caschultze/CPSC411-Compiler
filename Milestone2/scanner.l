@@ -16,10 +16,10 @@
   #define YY_DECL int JMMC::JMMLexer::yylex(JMMC::JMMParser::semantic_type *yylval, JMMC::JMMParser::location_type *loc)
 
   // Track location as characters are processed
-  //#define YY_USER_ACTION location->step(); location->columns(yyleng);
   #define YY_USER_ACTION loc->step();
 
   string lexeme;
+  int warningno = 0;
 %}
 
 NUMBER              [0-9][0-9]*
@@ -30,6 +30,8 @@ WHITESPACE          [ \t\r\n\f\v]+
 %x                  STRING
 
 %%
+
+\n                  { loc->lines(); }
 
 "true"              { yylval->sval = new std::string(yytext); return Token::T_TRUE; }
 "false"             { yylval->sval = new std::string(yytext); return Token::T_FALSE; }
@@ -102,13 +104,18 @@ WHITESPACE          [ \t\r\n\f\v]+
                       exit(EXIT_FAILURE);
                     }
 <STRING><<EOF>>     { 
-                      cerr << "Error: string missing closing quote at line" << to_string(yylineno) << endl;
+                      cerr << "Error: string missing closing quote at line " << to_string(yylineno) << endl;
                       exit(EXIT_FAILURE);
                     }
 
 .                   { 
                       /* todo: track number of warning messages */ 
                       cerr << "Warning: invalid character at line " << to_string(yylineno) << endl;
+                      warningno++;
+                      if (warningno > 10) {
+                        cerr << "Error: too many warnings, aborting process." << endl;
+                        exit(EXIT_FAILURE);
+                      }
                     }
 <<EOF>>             { return 0; }
 %%

@@ -1,14 +1,25 @@
-%skeleton "lalr1.cc"                    /* generate a C++ LALR(1) parser */
-%require "3.5.1"                        /* ON CPSC MACHINE MAKE THIS 3.7 */
-%defines                                /* define header files */
-%define api.namespace {JMMC}            /* define the namespace */
-%define api.parser.class {JMMParser}    /* define the parser class */
+/* 
+    This file is based on parser.yy of example-cpp shared in the tutorials.
+    Credits: Ali Jamadi / Shankar Ganesh
 
-%locations                              /* enable location tracking */
+    The grammar, types, and token values are different.
+*/ 
+
+
+/* Generate a C++ LALR(1) parser, using at least bison 3.5.1 */
+%skeleton "lalr1.cc"
+%require "3.5.1"    
+
+/* Generate header files, and define the namespace and parser class */
+%defines
+%define api.namespace {JMMC}
+%define api.parser.class {JMMParser}
+
+/* enable location tracking */
+%locations                              
 
 /* add dependencies */
 %code requires {
-    #include <vector>
     #include <iostream>
     #include <string>
     #include "ast.hpp"
@@ -24,7 +35,6 @@
     #include "driver.hpp"
 
     /* Switch yylex from default version to the JMMC version, that is defined in JMMC::Lexer */
-
     #undef yylex
     #define yylex driver.getToken
 }
@@ -32,39 +42,15 @@
 /* Prefix tokens with T_ */
 %define api.token.prefix {T_}
 
-/* 
-   Speficies the entire collection of data types for semantic values.
-   Names defined here are used in %token and %type declarations.
-
-   This union is called yylval.
-   The lexer will fill yylval.
-
-   The default return type (YYSTYPE/semantic_type) for any rule is int.
-   We want some rules to return ASTNodes.
-*/
 %union {
     std::string*        sval;
-
-    RootNode*           program;
-
-    LeafNode*           leaf;
-    DeclarationNode*    decl;
-
-    std::vector<ASTNode>*    vect;       
-
-    ExpressionNode*     expn;
-    StatementNode*      stmt;
+    ASTNode*            node;
+    ASTNodeCollection*  nodes;
 }
 
-/* The start symbol for this grammar is "start" */
 %start start
 
-/* keyword tokens */
-%token TRUE 
-%token FALSE 
-%token BOOLEAN 
-%token INT 
-%token VOID 
+%token <sval> TRUE FALSE BOOLEAN INT VOID ID NUMBER STRING
 %token IF 
 %token ELSE 
 %token WHILE 
@@ -77,205 +63,411 @@
 %token MOD "%"
 %token LT  "<"
 %token GT  ">"
-%token LE 
-%token GE 
+%token LE "<="
+%token GE ">="
 %token EQUIV "=" 
-%token EQ
-%token NE
+%token EQ "=="
+%token NE "!="
 %token NOT "!"
-%token AND 
-%token OR
+%token AND "&&"
+%token OR "||"
 %token LBRACKET "("
 %token RBRACKET ")"
 %token LBRACE "{"
 %token RBRACE "}"
 %token SEMICOLON ";"
 %token COMMA ","
-%token <sval> ID
-%token <sval> NUMBER
-%token <sval> STRING
 
-%type <leaf> identifier
-%type <decl> mainfunctiondeclaration
-%type <stmt> block
-%type <vect> globaldeclarations globaldeclaration mainfunctiondeclarator
+%type <node> literal identifier type block statement assignment expression primary
+%type <node> globaldeclaration variabledeclaration mainfunctiondeclaration functiondeclaration
+%type <node> statementexpression additiveexpression relationalexpression equalityexpression 
+%type <node> conditionalandexpression conditionalorexpression assignmentexpression multiplicativeexpression unaryexpression
+%type <node> postfixexpression functioninvocation formalparameter
+%type <nodes> globaldeclarations mainfunctiondeclarator blockstatement blockstatements 
+%type <nodes> formalparameterlist functionheader functiondeclarator argumentlist
 
 
 %%
-start                       : %empty                {   driver.tree = new RootNode(); }
-                            | globaldeclarations    {  /* If this was matched when the program begins,
-                                                        then assign the driver"s tree as the root node.  (ADD A CHILD?)*/
-                                                        driver.tree = new RootNode();
-                                                        //driver.tree->children->insert(driver.tree->children->end(), $1->begin(), $1->end());
-                                                        // debug:
-                                                        // for (auto element : driver.tree->children) {
-                                                        //     cout << element.type << endl;
-                                                        // }
+start                       : %empty                {   
+                                                        string str = "program"; 
+                                                        driver.tree = new ASTNode(str); 
+                                                    }
+                            | globaldeclarations    {   
+                                                        string str = "program"; 
+                                                        driver.tree = new ASTNode(str);
+                                                        for (auto node : $1->nodes)
+                                                            driver.tree->children.push_back(node);
                                                     }
                             ;
 
-literal                     : NUMBER            
-                            | STRING            
-                            | TRUE              
-                            | FALSE             
+literal                     : NUMBER                { string type = "number"; $$ = new ASTNode(type, *$1); }
+                            | STRING                { string type = "string"; $$ = new ASTNode(type, *$1); }
+                            | TRUE                  { string type = "true"; $$ = new ASTNode(type, *$1); }
+                            | FALSE                 { string type = "false"; $$ = new ASTNode(type, *$1); }
                             ;
 
-type                        : BOOLEAN
-                            | INT
+type                        : BOOLEAN               { string type = "boolean"; $$ = new ASTNode(type, *$1); }
+                            | INT                   { string type = "int"; $$ = new ASTNode(type, *$1); }
                             ;
 
-globaldeclarations          : globaldeclaration                             {
-                                                                                $$ = new vector<ASTNode>;
-                                                                                cout << "globaldeclarations: hello" << endl;
-                                                                                //$$->insert($$->end(), $1->begin(), $1->end());
-                                                                            }
-                            | globaldeclarations globaldeclaration
+globaldeclarations          : globaldeclaration                         { 
+                                                                            $$ = new ASTNodeCollection();
+                                                                            $$->AddNode(*$1); 
+                                                                        }
+                            | globaldeclarations globaldeclaration      { 
+                                                                            $1->AddNode(*$2);
+                                                                            $$ = $1;
+                                                                        }
                             ;
 
-globaldeclaration           : variabledeclaration
-                            | functiondeclaration
-                            | mainfunctiondeclaration                       {
-                                                                                $$ = new vector<ASTNode>;
-                                                                                cout << "globaldeclaration: hello" << endl;
-                                                                                //$$->insert($$.end(), $1.begin(), $1.end()); 
-                                                                            }
+globaldeclaration           : variabledeclaration           {
+                                                                if ($1->GetType() == "varDecl")
+                                                                {
+                                                                    $1->SetType("globVarDecl");
+                                                                    $$ = $1;
+                                                                }                    
+                                                            }
+                            | functiondeclaration           { 
+                                                                if ($1->GetType() == "funcDecl")
+                                                                {
+                                                                    $$ = $1;
+                                                                }
+                                                            }
+                            | mainfunctiondeclaration       { 
+                                                                if ($1->GetType() == "mainDecl")
+                                                                {
+                                                                    $$ = $1;
+                                                                }
+                                                            }
                             ;
 
-variabledeclaration         : type identifier ";"
+variabledeclaration         : type identifier ";"       {
+                                                            string type = "varDecl";
+                                                            $$ = new ASTNode(type);
+                                                            $$->children.push_back(*$1);
+                                                            $$->children.push_back(*$2);
+                                                        }
                             ;
 
-identifier                  : ID                                            {
-                                                                                std::string str = "id";
-                                                                                $$ = new LeafNode(str, *$1);
-                                                                                $$->print();
-                                                                            }
+identifier                  : ID                        {
+                                                            std::string type = "id";
+                                                            $$ = new ASTNode(type, *$1);
+                                                        }
                             ;
 
-functiondeclaration         : functionheader block
+functiondeclaration         : functionheader block                      { 
+                                                                            $$ = new ASTNode("funcDecl");
+                                                                    
+                                                                            for (auto node : $1->nodes)
+                                                                                $$->children.push_back(node);
+
+                                                                            $$->children.push_back(*$2);
+                                                                        }
+                            ;
+functionheader              : type functiondeclarator                   {
+                                                                            $$ = new ASTNodeCollection();
+                                                                            $$->AddNode(*$1);
+                                                                            for (auto node : $2->nodes)
+                                                                                $$->AddNode(node);
+                                                                        }
+                            | VOID functiondeclarator                   {   
+                                                                            $$ = new ASTNodeCollection();
+                                                                            auto x = new ASTNode("void", *$1);
+                                                                            $$->AddNode(*x);
+                                                                            for (auto node : $2->nodes)
+                                                                                $$->AddNode(node);
+                                                                        }
                             ;
 
-functionheader              : type functiondeclarator
-                            | VOID functiondeclarator
+functiondeclarator          : identifier "(" formalparameterlist ")"    {
+                                                                            $$ = new ASTNodeCollection();
+                                                                            $$->AddNode(*$1);
+
+                                                                            auto x = new ASTNode("formals");
+                                                                            for (auto node : $3->nodes)
+                                                                                x->children.push_back(node);
+
+                                                                            $$->AddNode(*x);
+                                                                        }
+                            | identifier "(" ")"                        { 
+                                                                            $$ = new ASTNodeCollection();
+                                                                            $$->AddNode(*$1);
+                                                                            auto x = new ASTNode("formals");
+                                                                            $$->AddNode(*x);
+
+                                                                            
+                                                                        }
                             ;
 
-functiondeclarator          : identifier "(" formalparameterlist ")"
-                            | identifier "(" ")"
+
+formalparameterlist         : formalparameter                           {
+                                                                            $$ = new ASTNodeCollection();
+                                                                            $$->AddNode(*$1);
+                                                                        }
+                            | formalparameterlist "," formalparameter   { 
+                                                                            $$ = $1;
+                                                                            $$->AddNode(*$3);
+                                                                        }
                             ;
 
-
-formalparameterlist         : formalparameter
-                            | formalparameterlist "," formalparameter
+formalparameter             : type identifier                           {
+                                                                            $$ = new ASTNode("formal");
+                                                                            $$->children.push_back(*$1);
+                                                                            $$->children.push_back(*$2);
+                                                                        }
                             ;
 
-formalparameter             : type identifier
-                            ;
+mainfunctiondeclaration     : mainfunctiondeclarator block      {   
+                                                                    $$ = new ASTNode("mainDecl");
 
-mainfunctiondeclaration     : mainfunctiondeclarator block                      {   
-                                                                                    cout << "mainfunctiondeclaration: hello" << endl;
-                                                                                    $$ = new DeclarationNode("mainDecl"); 
-                                                                                    $$->children.insert($$->children.end(), $1->begin(), $1->end());
-                                                                                    $$->children.push_back(*$2);
-                                                                                    $$->print();
-                                                                                }
+                                                                    string str1 = "void"; auto x = new ASTNode(str1);
+                                                                    $$->children.push_back(*x);
+
+                                                                    for (auto node : $1->nodes)
+                                                                        $$->children.push_back(node);
+
+                                                                    string str2 = "formals"; auto y = new ASTNode(str2);
+                                                                    $$->children.push_back(*y);
+
+                                                                    $$->children.push_back(*$2);
+                                                                }
                             ;
 
 mainfunctiondeclarator      : identifier "(" ")"                                {
-                                                                                    cout << "mainfunctiondeclarator: hello" << endl;
-                                                                                    $$ = new vector<ASTNode>;
-                                                                                    // // push node with void type
-                                                                                    $$->push_back(*$1);
-                                                                                    // // push node with formals type
+                                                                                    $$ = new ASTNodeCollection();
+                                                                                    $$->AddNode(*$1);
                                                                                 }
                             ;
 
-block                       : "{" blockstatements "}"                           
-                            | "{" "}"                                           {}
+block                       : "{" blockstatements "}"                           {
+                                                                                    string type = "block";
+                                                                                    $$ = new ASTNode(type);
+
+                                                                                    for (auto node : $2->nodes)
+                                                                                        $$->children.push_back(node);
+                                                                                }
+                            | "{" "}"                                           { string type = "block"; $$ = new ASTNode(type);}
                             ;
 
-blockstatements             : blockstatement                                    
-                            | blockstatements blockstatement                    
+blockstatements             : blockstatement                                    {
+                                                                                    $$ = $1;
+                                                                                }                                    
+                            | blockstatements blockstatement                    {
+                                                                                    $$ = $1;
+                                                                                    for (auto node : $2->nodes)
+                                                                                        $$->AddNode(node);
+                                                                                }
                             ;
 
-blockstatement              : variabledeclaration                               
-                            | statement                                         
+blockstatement              : variabledeclaration                               {
+                                                                                    $$ = new ASTNodeCollection();
+                                                                                    $$->AddNode(*$1);
+                                                                                }                             
+                            | statement                                         {
+                                                                                    $$ = new ASTNodeCollection();
+                                                                                    $$->AddNode(*$1);
+                                                                                }
                             ;
 
-statement                   : block                                             
-                            | ";"                                               
-                            | statementexpression ";"                           
-                            | BREAK ";"                                         
-                            | RETURN expression ";"                             
-                            | RETURN ";"                                            
-                            | IF "(" expression ")" statement                   
-                            | IF "(" expression ")" statement ELSE statement    
-                            | WHILE "(" expression ")" statement                
+statement                   : block                                             {
+                                                                                    $$ = $1;
+                                                                                }
+                            | ";"                                               {
+                                                                                    string type =  "nullStmt"; $$ = new ASTNode(type);
+                                                                                }
+                            | statementexpression ";"                           {
+                                                                                    $$ = $1;
+                                                                                }
+                            | BREAK ";"                                         {
+                                                                                    string type =  "break"; $$ = new ASTNode(type);
+                                                                                }
+                            | RETURN expression ";"                             {
+                                                                                    string type =  "return"; $$ = new ASTNode(type);
+                                                                                    $$->children.push_back(*$2);
+                                                                                }
+                            | RETURN ";"                                        {
+                                                                                    string type =  "return"; $$ = new ASTNode(type);
+                                                                                }
+                            | IF "(" expression ")" statement                   { 
+                                                                                    string type = "if"; $$ = new ASTNode(type);
+                                                                                    $$->children.push_back(*$3);
+                                                                                    $$->children.push_back(*$5);
+                                                                                }
+                            | IF "(" expression ")" statement ELSE statement    { 
+                                                                                    string type = "ifElse"; $$ = new ASTNode(type); 
+                                                                                    $$->children.push_back(*$3);
+                                                                                    $$->children.push_back(*$5);
+                                                                                    $$->children.push_back(*$7);
+                                                                                }
+                            | WHILE "(" expression ")" statement                {
+                                                                                    string type="while"; $$ = new ASTNode(type);
+                                                                                    $$->children.push_back(*$3);
+                                                                                    $$->children.push_back(*$5);
+                                                                                }    
                             ;
 
-statementexpression         : assignment
-                            | functioninvocation
+statementexpression         : assignment                                        {
+                                                                                    string type = "stmtExpr"; $$ = new ASTNode(type);
+                                                                                    $$->children.push_back(*$1);
+                                                                                }
+                            | functioninvocation                                {   
+                                                                                    string type = "stmtExpr"; $$ = new ASTNode(type);
+                                                                                    $$->children.push_back(*$1);
+                                                                                }
                             ;
 
-primary                     : literal
-                            | "(" expression ")"
-                            | functioninvocation
+primary                     : literal                                               { $$ = $1; }
+                            | "(" expression ")"                                    { $$ = $2; }
+                            | functioninvocation                                    { $$ = $1; }
                             ;
 
-argumentlist                : expression
-                            | argumentlist "," expression
+argumentlist                : expression                                            { 
+                                                                                        $$ = new ASTNodeCollection();
+                                                                                        $$->AddNode(*$1); 
+                                                                                    }
+                            | argumentlist "," expression                           {
+                                                                                        $$ = $1;
+                                                                                        $$->AddNode(*$3);
+                                                                                    }
                             ;
 
-functioninvocation          : identifier "(" argumentlist ")"
-                            | identifier "(" ")"
+functioninvocation          : identifier "(" argumentlist ")"                       { 
+                                                                                        string type = "funcCall"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+
+                                                                                        string str1 = "actuals"; auto x = new ASTNode(str1);
+                                                                                        for (auto node : $3->nodes)
+                                                                                            x->children.push_back(node);
+                                                                                        $$->children.push_back(*x);
+
+                                                                                    }
+                            | identifier "(" ")"                                    {
+                                                                                        string type = "funcCall"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+
+                                                                                        string str1 = "actuals"; auto x = new ASTNode(str1);
+                                                                                        $$->children.push_back(*x);
+
+                                                                                    }
                             ;
 
-postfixexpression           : primary
-                            | identifier
+postfixexpression           : primary                                               { $$ = $1; }
+                            | identifier                                            { $$ = $1; }
                             ;
 
-unaryexpression             : "-" unaryexpression
-                            | "!" unaryexpression
-                            | postfixexpression
+unaryexpression             : "-" unaryexpression                                   { 
+                                                                                        string str = "-";
+                                                                                        if ($2->type == "number") {
+                                                                                            str.append($2->attr);
+                                                                                            $$ = new ASTNode($2->type, str);
+                                                                                        } else {
+                                                                                            $$ = new ASTNode(str);
+                                                                                            $$->children.push_back(*$2);
+                                                                                        }
+                                                                                        
+                                                                                    }
+                            | "!" unaryexpression                                   { 
+                                                                                        string type = "!"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$2);
+                                                                                    }
+                            | postfixexpression                                     { $$ = $1; }
                             ;
 
-multiplicativeexpression    : unaryexpression
-                            | multiplicativeexpression "*" unaryexpression
-                            | multiplicativeexpression "/" unaryexpression
-                            | multiplicativeexpression "%" unaryexpression
+multiplicativeexpression    : unaryexpression                                       { $$ = $1; }
+                            | multiplicativeexpression "*" unaryexpression          { 
+                                                                                        string type = "*"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | multiplicativeexpression "/" unaryexpression          { 
+                                                                                        string type = "/"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | multiplicativeexpression "%" unaryexpression          { 
+                                                                                        string type = "%"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-additiveexpression          : multiplicativeexpression
-                            | additiveexpression "+" multiplicativeexpression
-                            | additiveexpression "-" multiplicativeexpression
+additiveexpression          : multiplicativeexpression                              { $$ = $1; }
+                            | additiveexpression "+" multiplicativeexpression       { 
+                                                                                        string type = "+"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | additiveexpression "-" multiplicativeexpression       { 
+                                                                                        string type = "-"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-relationalexpression        : additiveexpression
-                            | relationalexpression "<" additiveexpression
-                            | relationalexpression ">" additiveexpression
-                            | relationalexpression LE additiveexpression
-                            | relationalexpression GE additiveexpression
+relationalexpression        : additiveexpression                                    { $$ = $1; }
+                            | relationalexpression "<" additiveexpression           {   
+                                                                                        string type = "<"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | relationalexpression ">" additiveexpression           { 
+                                                                                        string type = ">"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | relationalexpression "<=" additiveexpression          { 
+                                                                                        string type = "<="; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | relationalexpression ">=" additiveexpression          { 
+                                                                                        string type = ">="; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-equalityexpression          : relationalexpression
-                            | equalityexpression EQ relationalexpression
-                            | equalityexpression NE relationalexpression
+equalityexpression          : relationalexpression                                  { $$ = $1; }
+                            | equalityexpression "==" relationalexpression          { 
+                                                                                        string type = "=="; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
+                            | equalityexpression "!=" relationalexpression          { 
+                                                                                        string type = "!="; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-conditionalandexpression    : equalityexpression
-                            | conditionalandexpression AND equalityexpression
+conditionalandexpression    : equalityexpression                                    { $$ = $1; }
+                            | conditionalandexpression "&&" equalityexpression      { 
+                                                                                        string type = "&&"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-conditionalorexpression     : conditionalandexpression
-                            | conditionalorexpression OR conditionalorexpression
+conditionalorexpression     : conditionalandexpression                              { $$ = $1; }
+                            | conditionalorexpression "||" conditionalorexpression  { 
+                                                                                        string type = "||"; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-assignmentexpression        : conditionalorexpression
-                            | assignment
+assignmentexpression        : conditionalorexpression                               { $$ = $1; }
+                            | assignment                                            { $$ = $1; }
                             ;
 
-assignment                  : identifier "=" assignmentexpression
+assignment                  : identifier "=" assignmentexpression                   {
+                                                                                        string type = "="; $$ = new ASTNode(type);
+                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back(*$3);
+                                                                                    }
                             ;
 
-expression                  : assignmentexpression
+expression                  : assignmentexpression                                  { $$ = $1; }                          
                             ;
 %%
 

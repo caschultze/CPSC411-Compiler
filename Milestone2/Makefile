@@ -1,3 +1,6 @@
+# This file is based on the file Makefile of example-cpp shared in the tutorials.
+# Credits: Ali Jamadi / Shankar Ganesh
+
 CC := g++
 CXXFLAGS := -Wall
 objs := parser.o scanner.o driver.o main.o ast.o

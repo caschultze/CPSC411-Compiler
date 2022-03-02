@@ -1,3 +1,6 @@
+// This file is based on driver.hpp of example-cpp shared in the tutorials.
+// Credits: Ali Jamadi / Shankar Ganesh
+
 #ifndef DRIVER_HPP
 #define DRIVER_HPP
 
@@ -12,30 +15,22 @@ class Driver {
 
     public:
 
-        Driver(const char* file) : file_name(file) {}
-
+        Driver() {}
         ~Driver();
 
-        // starts compilation of the source code
-        bool start(std::istream &in);
-
-        // never used, i think
-        string getFileName() { return file_name; }
-
-        // calls yylex, prints token when debugging mode
-        int getToken(JMMC::JMMParser::semantic_type *yylval, JMMC::JMMParser::location_type *location);
-        
         // Parser will identify this.
         ASTNode* tree = nullptr;
 
-    private:
+        // Starts compilation of the source code.
+        bool start(std::istream &in);
 
-        bool parse(std::istream &in);
+        // Calls yylex.
+        int getToken(JMMC::JMMParser::semantic_type *yylval, JMMC::JMMParser::location_type *location);
         
-        std::string file_name; // never used, i think
+    private:
+        bool parse(std::istream &in);
         unique_ptr<JMMC::JMMParser> parser{nullptr};
         unique_ptr<JMMC::JMMLexer> lexer{nullptr};
-
 };
 
 #endif

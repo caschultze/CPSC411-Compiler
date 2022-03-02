@@ -1,63 +1,39 @@
 #ifndef AST_HPP
 #define AST_HPP
 
-#include <iostream>
 #include <vector>
 #include <string>
 
 using namespace std;
 
-// Base class for other AST nodes.
-// type = the type of grammar rule that has been matched.
-// lineno = the line of source code that the grammar rule matched to.
-// attr = the value of the type (only applies to leaf nodes).
-
+// ASTNodes are nodes of an abract syntax tree. 
+// The parser uses these to generate an AST for tokens caught by the scanner.
 class ASTNode {
     public:
-        vector<ASTNode>* children;
+        vector<ASTNode> children;
         string type;
+        int lineno;
         string attr;
 
         ASTNode();
+        ASTNode(string _type) : type(_type) {};
+        ASTNode(string _type, string _attr) : type(_type), attr(_attr) {}
         ~ASTNode();
-        virtual void print();                 
+        
+        virtual void print();
+        virtual void print(int);
+
+        string GetType() { return type; }
+        void SetType(string _type) { type = _type; }
 };
 
-// RootNode extends ASTNode. It is used excusively when the start rule is matched.
-class RootNode : public ASTNode {
-    //void print();
-    //vector<ASTNode> children;
-};
-// void RootNode::print() {
-//     cout<<type<<" {"<<"'type': '"<<type<<"'}"<<endl; 
-// }
-
-
-class ExpressionNode : public ASTNode {
-
-};
-
-class StatementNode : public ASTNode {
+// This class simply has a vector of ASTNodes.
+class ASTNodeCollection {
     public:
-        string type;
-        vector<ASTNode> children;
-        void print();
-};
+        ASTNodeCollection() {}
+        vector<ASTNode> nodes;
 
-class DeclarationNode : public ASTNode {
-    public:
-        string type;
-        vector<ASTNode> children;
-        DeclarationNode(string t): type(t) {};
-        void print();
-};
-
-class LeafNode : public ASTNode {
-    public:
-        string type;
-        string attr;
-        LeafNode(string t, string a): type(t), attr(a) {};
-        void print();
+        void AddNode(ASTNode _node) { nodes.push_back(_node); } 
 };
 
 #endif

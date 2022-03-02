@@ -1,3 +1,6 @@
+// This file is based on scanner.hpp of example-cpp shared in the tutorials.
+// Credits: Ali Jamadi / Shankar Ganesh
+
 #ifndef SCANNER_HPP
 #define SCANNER_HPP
 
@@ -30,7 +33,6 @@ namespace JMMC {
     };
 }
 
-// From TA simple-cpp:
 std::unique_ptr<JMMC::JMMLexer> createLexer(std::istream* input);
 
 #endif
