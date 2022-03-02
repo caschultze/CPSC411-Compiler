@@ -1,3 +1,7 @@
 *.o
 lex.yy.c
 main
+
+*.d
+*.o
+*.hh
