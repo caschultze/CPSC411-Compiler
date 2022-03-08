@@ -157,8 +157,8 @@ variabledeclaration         : type identifier ";"       {
                             ;
 
 identifier                  : ID                        {
-                                                            std::cout << "Parser: " << @1 << endl;
-                                                            $$ = new ASTNode("id", *$1);
+                                                            //std::cout << "Parser: " << @1.begin.line << endl;
+                                                            $$ = new ASTNode("id", @1.begin.line, *$1);
                                                         }
                             ;
 

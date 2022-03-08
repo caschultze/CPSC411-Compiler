@@ -18,6 +18,8 @@ class ASTNode {
         ASTNode();
         ASTNode(string _type) : type(_type) {};
         ASTNode(string _type, string _attr) : type(_type), attr(_attr) {}
+        ASTNode(string _type, int _lineno, string _attr) : type(_type), lineno(_lineno), attr(_attr) {}
+
         ~ASTNode();
         
         virtual void print();

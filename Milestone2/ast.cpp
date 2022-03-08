@@ -17,7 +17,7 @@ void ASTNode::print() {
     if (type != "")
     {
         cout << type  << " {'type': '" << type << "'";
-
+        
         if (lineno > 0){
             cout << ", 'lineno': '" << lineno << "'";
         }
@@ -42,6 +42,10 @@ void ASTNode::print(int num_tabs)
             cout << '\t';
 
         cout << type  << " {'type': '" << type << "'";
+
+        if (lineno > 0){
+            cout << ", 'lineno': '" << lineno << "'";
+        }
         
         if (attr != "") {
              cout << ", 'attr': '" << attr << "'";
