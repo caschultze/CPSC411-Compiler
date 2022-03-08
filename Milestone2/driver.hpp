@@ -25,12 +25,12 @@ class Driver {
         bool start(std::istream &in);
 
         // Calls yylex.
-        int getToken(JMMC::JMMParser::semantic_type *yylval, JMMC::JMMParser::location_type *location);
+        int getToken(JMM::Parser::semantic_type *yylval, JMM::Parser::location_type *location);
         
     private:
         bool parse(std::istream &in);
-        unique_ptr<JMMC::JMMParser> parser{nullptr};
-        unique_ptr<JMMC::JMMLexer> lexer{nullptr};
+        unique_ptr<JMM::Parser> parser{nullptr};
+        unique_ptr<JMM::Lexer> lexer{nullptr};
 };
 
 #endif

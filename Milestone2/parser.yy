@@ -12,8 +12,8 @@
 
 /* Generate header files, and define the namespace and parser class */
 %defines
-%define api.namespace {JMMC}
-%define api.parser.class {JMMParser}
+%define api.namespace {JMM}
+%define api.parser.class {Parser}
 
 /* 
     enable location tracking 
@@ -480,7 +480,7 @@ expression                  : assignmentexpression                              
 
 // JMMParser calls this function when there is an error.
 // It is currently the same as the TA"s in simple-cpp.
-void JMMC::JMMParser::error(const location_type &location, const std::string &errmsg) 
+void JMM::Parser::error(const location_type &location, const std::string &errmsg) 
 {
     std::cerr << "Error: " << errmsg << " at " << location << "\n";
 }

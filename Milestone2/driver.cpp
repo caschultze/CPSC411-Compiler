@@ -25,9 +25,9 @@ bool Driver::start(istream &in)
     return res;
 }
 
-int Driver::getToken(JMMC::JMMParser::semantic_type *yylval, JMMC::JMMParser::location_type *location)
+int Driver::getToken(JMM::Parser::semantic_type *yylval, JMM::Parser::location_type *yylloc)
 {
-    int tok = lexer->yylex(yylval, location);
+    int tok = lexer->yylex(yylval, yylloc);
     // int DEBUG = 0;
     // if (DEBUG) {
     //     cout << "Token: " << (JMMC::JMMParser::token::yytokentype)tok << endl;
@@ -39,7 +39,7 @@ bool Driver::parse(istream &in)
 {
     lexer = createLexer(&in);
 
-    parser = std::make_unique<JMMC::JMMParser>(*this);
+    parser = std::make_unique<JMM::Parser>(*this);
 
     if (parser->parse() != 0)
     {

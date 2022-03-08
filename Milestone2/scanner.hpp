@@ -17,22 +17,22 @@
 
 using namespace std;
 
-namespace JMMC {
-    class JMMLexer : public yyFlexLexer {
+namespace JMM {
+    class Lexer : public yyFlexLexer {
         
         public:
             
-            JMMLexer(istream *in) : yyFlexLexer(in) {}
+            Lexer(istream *in) : yyFlexLexer(in) {}
 
-            virtual ~JMMLexer() = default;
+            virtual ~Lexer() = default;
 
             virtual int yylex(
-                JMMC::JMMParser::semantic_type *yylval,
-                JMMC::JMMParser::location_type *location
+                JMM::Parser::semantic_type *yylval,
+                JMM::Parser::location_type *location
             );
     };
 }
 
-std::unique_ptr<JMMC::JMMLexer> createLexer(std::istream* input);
+std::unique_ptr<JMM::Lexer> createLexer(std::istream* input);
 
 #endif
