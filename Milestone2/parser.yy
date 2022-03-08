@@ -41,7 +41,7 @@
     #include <fstream>
     #include "driver.hpp"
 
-    /* Switch yylex from default version to the JMMC version, that is defined in JMMC::Lexer */
+    /* Switch yylex from default version to the JMM version, that is defined in JMM::Lexer */
     #undef yylex
     #define yylex driver.getToken
 }
@@ -157,8 +157,8 @@ variabledeclaration         : type identifier ";"       {
                             ;
 
 identifier                  : ID                        {
-                                                            std::string type = "id";
-                                                            $$ = new ASTNode(type, *$1);
+                                                            std::cout << "Parser: " << @1 << endl;
+                                                            $$ = new ASTNode("id", *$1);
                                                         }
                             ;
 

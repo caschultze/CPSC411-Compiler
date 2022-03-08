@@ -24,7 +24,7 @@
 
 NUMBER              [0-9][0-9]*
 ID                  [_a-zA-Z][_a-zA-Z0-9]*
-WHITESPACE          [ \t\r\n\f\v]+
+WHITESPACE          [ \t\r\f\v]+
 
 %x                  COMMENT
 %x                  STRING
@@ -32,6 +32,7 @@ WHITESPACE          [ \t\r\n\f\v]+
 %%
 
 \n                  { 
+                      std::cout << "Loc of newline: " << *yylloc << "\n";
                       yylloc->lines();    // Increment the number of lines.
                       yylloc->step();     // Set the beginning char for the token.
                     }
@@ -144,7 +145,7 @@ WHITESPACE          [ \t\r\n\f\v]+
 {WHITESPACE}        { ; }
 
 "//"                { BEGIN(COMMENT); }
-<COMMENT>(\r|\n)+   { BEGIN(INITIAL);}
+<COMMENT>(\n)   { std::cout << "Loc of newline: " << *yylloc << "\n"; yylloc->lines(); yylloc->step(); BEGIN(INITIAL);}
 <COMMENT>.          { ; }
 <COMMENT><<EOF>>    { return 0; }
 

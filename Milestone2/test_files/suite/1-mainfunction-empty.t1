@@ -1,4 +1,6 @@
 // Purpose:
 // Test mainFunc declarator
 
-main() { }
+main() 
+{ 
+}
