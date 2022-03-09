@@ -108,7 +108,7 @@ start                       : %empty                {
                             ;
 
 literal                     : NUMBER                { string type = "number"; $$ = new ASTNode(type, *$1); }
-                            | STRING                { string type = "string"; $$ = new ASTNode(type, *$1); }
+                            | STRING                { std::cout << "debug: hello string!" << std::endl; string type = "string"; $$ = new ASTNode(type, *$1); }
                             | TRUE                  { string type = "true"; $$ = new ASTNode(type, *$1); }
                             | FALSE                 { string type = "false"; $$ = new ASTNode(type, *$1); }
                             ;
@@ -478,9 +478,7 @@ expression                  : assignmentexpression                              
                             ;
 %%
 
-// JMMParser calls this function when there is an error.
-// It is currently the same as the TA"s in simple-cpp.
-void JMM::Parser::error(const location_type &location, const std::string &errmsg) 
-{
-    std::cerr << "Error: " << errmsg << " at " << location << "\n";
+// Parser calls this function when there is an error.
+void JMM::Parser::error(const location_type &location, const std::string &errmsg) {
+    std::cerr << "Error: " << errmsg << " at or near line " << location.begin.line << std::endl;
 }

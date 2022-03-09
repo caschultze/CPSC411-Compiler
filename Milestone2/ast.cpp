@@ -4,7 +4,6 @@
 using namespace std;
 
 ASTNode::ASTNode() {
-    lineno = 0;
 }
 
 ASTNode::~ASTNode() {
@@ -48,7 +47,37 @@ void ASTNode::print(int num_tabs)
         }
         
         if (attr != "") {
-             cout << ", 'attr': '" << attr << "'";
+            cout << ", 'attr': '";
+            for (size_t i = 0; i < attr.length(); i++) {
+                switch (attr[i]) {
+                    case '\b':
+                        cout << '\\b';
+                        break;
+                    case '\f':
+                        break;
+                    case '\t':
+                        cout << "\\t";
+                        break;
+                    case '\r':
+                        cout << '\\r';
+                        break;
+                    case '\'':
+                        cout << "\'";
+                        break;
+                    case '\"':
+                        cout << "\"";
+                        break;
+                    case '\\':
+                        cout << "\\\\";
+                        break;
+                    case '\0':
+                        cout << "\\x00";
+                        break;
+                    default:
+                        cout << attr[i];
+                }
+            }
+            cout << "'";
         }
 
         cout << "}" << endl;
