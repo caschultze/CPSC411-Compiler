@@ -1,6 +1,5 @@
-// Purpose:
-// Test mainFunc declarator
+int foo(int arg1, int arg2) { ; }
 
-main() 
-{ 
+main() {
+    break; return x = a>b;
 }

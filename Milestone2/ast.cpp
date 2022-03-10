@@ -18,7 +18,7 @@ void ASTNode::print() {
         cout << type  << " {'type': '" << type << "'";
         
         if (lineno > 0){
-            cout << ", 'lineno': '" << lineno << "'";
+            cout << ", 'lineno': " << lineno;
         }
         
         if (attr != "") {
@@ -43,7 +43,7 @@ void ASTNode::print(int num_tabs)
         cout << type  << " {'type': '" << type << "'";
 
         if (lineno > 0){
-            cout << ", 'lineno': '" << lineno << "'";
+            cout << ", 'lineno': " << lineno;
         }
         
         if (attr != "") {
@@ -51,15 +51,16 @@ void ASTNode::print(int num_tabs)
             for (size_t i = 0; i < attr.length(); i++) {
                 switch (attr[i]) {
                     case '\b':
-                        cout << '\\b';
+                        cout << "\\b";
                         break;
                     case '\f':
+                        cout << "\\f";
                         break;
                     case '\t':
                         cout << "\\t";
                         break;
                     case '\r':
-                        cout << '\\r';
+                        cout << "\\r";
                         break;
                     case '\'':
                         cout << "\'";
