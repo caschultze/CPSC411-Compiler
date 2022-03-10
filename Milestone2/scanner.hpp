@@ -23,7 +23,6 @@ namespace JMM {
         public:
             
             Lexer(istream *in) : yyFlexLexer(in) {}
-
             virtual ~Lexer() = default;
 
             virtual int yylex(

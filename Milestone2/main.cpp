@@ -1,6 +1,3 @@
-// This file is based on the file main.cpp of example-cpp shared in the tutorials.
-// Credits: Ali Jamadi / Shankar Ganesh
-
 #include <iostream>
 #include <fstream>
 

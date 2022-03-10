@@ -15,14 +15,14 @@ class ASTNode {
         int lineno;
         string attr;
 
-        ASTNode();
+        ASTNode() {}
+        ~ASTNode() {}
+
         ASTNode(string _type) : type(_type) { lineno = 0; };
         ASTNode(string _type, string _attr) : type(_type), attr(_attr) { lineno = 0; }
         ASTNode(string _type, int _lineno) : type(_type), lineno(_lineno) {}
         ASTNode(string _type, int _lineno, string _attr) : type(_type), lineno(_lineno), attr(_attr) {}
 
-        ~ASTNode();
-        
         virtual void print();
         virtual void print(int);
 
@@ -36,9 +36,8 @@ class ASTNode {
 // This class simply has a vector of ASTNodes.
 class ASTNodeCollection {
     public:
-        ASTNodeCollection() {}
         vector<ASTNode> nodes;
-
+        ASTNodeCollection() {}
         void AddNode(ASTNode _node) { nodes.push_back(_node); } 
 };
 

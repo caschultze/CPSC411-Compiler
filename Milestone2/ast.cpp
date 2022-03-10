@@ -3,14 +3,6 @@
 
 using namespace std;
 
-ASTNode::ASTNode() {
-}
-
-ASTNode::~ASTNode() {
-    ;
-}
-
-// Print contents of ASTNode.
 void ASTNode::print() {
     int num_tabs = 0;
     if (type != "")
@@ -32,7 +24,6 @@ void ASTNode::print() {
     }
 }
 
-// Print contents of ASTNode, preceeded by num_tabs instances of '\t'.
 void ASTNode::print(int num_tabs)
 {
     if (type != "")

@@ -1,31 +1,10 @@
-/* 
-    This file is based on parser.yy of example-cpp shared in the tutorials.
-    Credits: Ali Jamadi / Shankar Ganesh
-
-    The grammar, types, and token values are different.
-*/ 
-
-
-/* Generate a C++ LALR(1) parser, using at least bison 3.5.1 */
 %skeleton "lalr1.cc"
 %require "3.5.1"    
-
-/* Generate header files, and define the namespace and parser class */
 %defines
 %define api.namespace {JMM}
 %define api.parser.class {Parser}
-
-/* 
-    enable location tracking 
-    
-    note:
-    I couldn't get location tracking figured out, so this parser is limited
-    such that it has bad error messages and the AST does not include line numbers
-    for nodes.
-*/
 %locations                              
 
-/* add dependencies */
 %code requires {
     #include <iostream>
     #include <string>
@@ -41,12 +20,10 @@
     #include <fstream>
     #include "driver.hpp"
 
-    /* Switch yylex from default version to the JMM version, that is defined in JMM::Lexer */
     #undef yylex
     #define yylex driver.getToken
 }
 
-/* Prefix tokens with T_ */
 %define api.token.prefix {T_}
 
 %union {
@@ -84,7 +61,6 @@
 %token RBRACE "}"
 %token SEMICOLON ";"
 %token COMMA ","
-
 %type <node> literal identifier type block statement assignment expression primary
 %type <node> globaldeclaration variabledeclaration mainfunctiondeclaration functiondeclaration
 %type <node> statementexpression additiveexpression relationalexpression equalityexpression 

@@ -15,16 +15,12 @@ class Driver {
 
     public:
 
+        ASTNode* tree = nullptr;
+
         Driver() {}
         ~Driver();
 
-        // Parser will identify this.
-        ASTNode* tree = nullptr;
-
-        // Starts compilation of the source code.
         bool start(std::istream &in);
-
-        // Calls yylex.
         int getToken(JMM::Parser::semantic_type *yylval, JMM::Parser::location_type *location);
         
     private:
