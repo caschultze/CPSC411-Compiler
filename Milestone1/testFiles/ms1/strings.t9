@@ -1,6 +1,7 @@
 // strings
-
-"abc"
-"ab\t\ndef"
-"ab\"cd"
-"ab\\\"cd"
+int main() {
+x = "abc";
+x = "ab\t\ndef";
+x = "ab\"cd";
+x = "ab\\\'cd";
+}

@@ -5,3 +5,5 @@ main
 *.d
 *.o
 *.hh
+*.cc
+parser
