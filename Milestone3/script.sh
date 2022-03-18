@@ -1,7 +1,7 @@
 #!/bin/bash
-read -p 'MakeFile path (e.g. ./src): ' makefilepath
+read -p 'Main file path (e.g. ./src): ' mainfilepath
 
-$makefilepath/make
+# $makefile/make
 
 read -p 'Test file path (e.g. ./test): ' testfilepath
 
@@ -12,5 +12,5 @@ do
     echo ""
     echo "Semantic checking file $file"
     echo "================================================="
-    ./main "$file"
+    $mainfilepath/main "$file"
 done

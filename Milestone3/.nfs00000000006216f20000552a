@@ -1,0 +1,95 @@
+Script started on 2022-03-18 10:49:03-06:00 [TERM="xterm-256color" TTY="/dev/pts/8" COLUMNS="73" LINES="26"]
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ^C[?2004l[?2004h[?2004l
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ls
+[?2004lscript.sh  [0m[01;34mtest[0m  typescript
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  rm t[K[K[K[Kls typescript 
+[?2004ltypescript
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  cat  typescript 
+[?2004l]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  rm typescript 
+[?2004l]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ls
+[?2004lscript.sh  [0m[01;34mtest[0m
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  clear
+[?2004l[H[2J[3J]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ./test/[K[K[K[Ks[K[Ks[K[K[K.s[K[Kscri[K[K[K[Kpw[K[Kls
+[?2004lscript.sh  [0m[01;34mtest[0m
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ./schm[K[K[K[Kchmod +x script.sh 
+[?2004lbash: ./chmod: No such file or directory
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  chrm[K[Kmod +x script.sh 
+[?2004l]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ./script.sh 
+[?2004lMakeFile path (e.g. ./src): ^C
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  vim script.sh 
+[?2004l[?1049h[22;0;0t[>4;2m[?1h=[?2004h[?1004h[1;26r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[26;1H"script.sh" [noeol] 16L, 350B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[34m#!/bin/bash[m
+[38;5;130mread[m [35m-p[m [38;5;130m'[m[31mMakeFile path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;52H[K[3;1H[K[4;1H[35m$makefilepath[m/make
+
+[38;5;130mread[m [35m-p[m [38;5;130m'[m[31mTest file path (e.g. ./test): [m[38;5;130m'[m testfilepath
+
+[38;5;130mfor[m file [38;5;130min[m [35m$testfilepath[m/*
+[38;5;130mdo
+[m    [38;5;130m[[m [38;5;130m-f[m [38;5;130m"[m[35m$file[m[38;5;130m"[m [38;5;130m][m [38;5;130m||[m [38;5;130mcontinue
+[m    [38;5;130mecho[m[31m [m[38;5;130m""
+[m    [38;5;130mecho[m[31m [m[38;5;130m""
+[m    [38;5;130mecho[m[31m [m[38;5;130m"[m[31mSemantic checking file [m[35m$file[m[38;5;130m"
+[m    [38;5;130mecho[m[31m [m[38;5;130m"[m[31m=================================================[m[38;5;130m"[m
+    ./main [38;5;130m"[m[35m$file[m[38;5;130m"
+done[m
+[94m~                                                                        [18;1H~                                                                        [19;1H~                                                                        [20;1H~                                                                        [21;1H~                                                                        [22;1H~                                                                        [23;1H~                                                                        [24;1H~                                                                        [25;1H~                                                                        [m[26;56H1,1[11CAll[1;1H[?25h[?12$p[?25l[26;46Hi[1;1H[26;46H [1;1H[26;1H[1m-- INSERT --[m[26;13H[K[26;56H1,1[11CAll[1;1H[?25h[?25l[26;58H2[1;2H[?25h[?25l[26;56H2[2;2H[?25h[?25l[26;58H3[2;3H[?25h[?25l[26;58H4[2;4H[?25h[?25l[26;58H5[2;5H[?25h[?25l[26;58H6[2;6H[?25h[?25l[26;58H7[2;7H[?25h[?25l[26;58H8[2;8H[?25h[?25l[26;58H9[2;9H[?25h[?25l[26;58H10[2;10H[?25h[?25l[26;59H1[2;11H[?25h[?25l[26;59H2[2;12H[?25h[?25l[26;59H3[2;13H[?25h[?25l[26;59H4[2;14H[?25h[?25l[26;59H5[2;15H[?25h[?25l[26;59H6[2;16H[?25h[?25l[26;59H7[2;17H[?25h[?25l[26;59H8[2;18H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;51H[K[26;59H7[2;17H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;50H[K[26;59H6[2;16H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;49H[K[26;59H5[2;15H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;48H[K[26;59H4[2;14H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;47H[K[26;59H3[2;13H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;46H[K[26;59H2[2;12H[?25h[?25l[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[2;45H[K[26;59H1[2;11H[?25h[?25l[31ma path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H2[2;12H[?25h[?25l[31mi path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H3[2;13H[?25h[?25l[31mn path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H4[2;14H[?25h[?25l[1C[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H5[2;15H[?25h[?25l[31mf path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H6[2;16H[?25h[?25l[31mi path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H7[2;17H[?25h[?25l[31ml path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H8[2;18H[?25h[?25l[31me path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;59H9[2;19H[?25h[?25l[1C[31m path (e.g. ./src): [m[38;5;130m'[m makefilepath[26;58H20[2;20H[?25h[?25l[31mpath (e.g. ./src): [m[38;5;130m'[m makefilepath[2;53H[K[26;58H19[2;19H[?25h[?25l[26;56H3,1 [3;1H[?25h[?25l[26;56H4,19[4;19H[?25h[?25l[4;18H[K[26;59H8[4;18H[?25h[?25l[4;17H[K[26;59H7[4;17H[?25h[?25l[4;16H[K[26;59H6[4;16H[?25h[?25l[4;15H[K[26;59H5[4;15H[?25h[?25l[4;14H[K[26;59H4[4;14H[?25h[?25l[4;13H[K[26;59H3[4;13H[?25h[?25l[4;12H[K[26;59H2[4;12H[?25h[?25l[4;11H[K[26;59H1[4;11H[?25h[?25l[4;10H[K[26;59H0[4;10H[?25h[?25l[4;9H[K[26;58H9 [4;9H[?25h[?25l[4;8H[K[26;58H8[4;8H[?25h[?25l[4;7H[K[26;58H7[4;7H[?25h[?25l[35mi[m[26;58H8[4;8H[?25h[?25l[35ml[m[26;58H9[4;9H[?25h[?25l[35me[m[26;58H10[4;10H[?25h[?25l/[26;59H1[4;11H[?25h[?25lm[26;59H2[4;12H[?25h[?25la[26;59H3[4;13H[?25h[?25lk[26;59H4[4;14H[?25h[?25le[26;59H5[4;15H[?25h[?25l[26;59H [4;1H[?25h[?25l[34m#$makefile/make[m[26;58H2[4;2H[?25h[?25l[26;58H16[4;16H[?25h[?25l[26;56H5,1 [5;1H[?25h[?25l[26;56H6,54[6;54H[?25h[?25l[26;56H7,1 [7;1H[?25h[?25l[26;56H8,28[8;28H[?25h[?25l[26;56H7,1 [7;1H[?25h[?25l[26;56H6,54[6;54H[?25h[?25l[26;56H5,1 [5;1H[?25h[?25l[26;56H4,16[4;16H[?25h[?25l[26;59H [4;1H[?25h[?25l [34m#$makefile/make[m[26;58H2[4;2H[?25h[?25l[34m#$makefile/make[m[4;16H[K[26;58H1[4;1H[?25h[?25l[26;58H2[4;2H[?25h[?25l[34m $makefile/make[m[26;58H3[4;3H[?25h[?25l[26;56H3,1[3;1H[?25h[?25l[26;56H2,3[2;3H[?25h[?25l[26;58H53[2;53H[?25h[?25l[2;52H[K[26;59H2[2;52H[?25h[?25l[2;51H[K[26;59H1[2;51H[?25h[?25l[2;50H[?25l[26;56H4,16[4;16H[?25h[?25l[26;59H [4;1H[?25h[?25l [34m#$makefile/make[m[26;58H2[4;2H[?25h[?25l[34m#$makefile/make[m[4;16H[K[26;58H1[4;1H[?25h[?25l[26;58H2[4;2H[?25h[?25l[34m $makefile/make[m[26;58H3[4;3H[?25h[?25l[26;56H3,1[3;1H[?25h[?25l[26;56H2,3[2;3H[?25h[?25l[26;58H53[2;53H[?25h[?25l[2;52H[K[26;59H2[2;52H[?25h[?25l[2;51H[K[26;59H1[2;51H[?25h[?25l[2;50H[K[26;59H0[2;50H[?25h[?25l[2;49H[K[26;58H49[2;49H[?25h[?25l[2;48H[K[26;59H8[2;48H[?25h[?25l[2;47H[K[26;59H7[2;47H[?25h[?25l[2;46H[K[26;59H6[2;46H[?25h[?25l[2;45H[K[26;59H5[2;45H[?25h[?25l[2;44H[K[26;59H4[2;44H[?25h[?25l[2;43H[K[26;59H3[2;43H[?25h[?25l[2;42H[K[26;59H2[2;42H[?25h[?25l[2;41H[K[26;59H1[2;41H[?25h[?25lm[26;59H2[2;42H[?25h[?25la[26;59H3[2;43H[?25h[?25li[26;59H4[2;44H[?25h[?25ln[26;59H5[2;45H[?25h[?25lf[26;59H6[2;46H[?25h[?25li[26;59H7[2;47H[?25h[?25ll[26;59H8[2;48H[?25h[?25le[26;59H9[2;49H[?25h[?25lp[26;58H50[2;50H[?25h[?25la[26;59H1[2;51H[?25h[?25lt[26;59H2[2;52H[?25h[?25lh[26;59H3[2;53H[?25h[?25l[26;56H3,1 [3;1H[?25h[?25l[26;56H4,17[4;17H[?25h[?25l[26;56H5,1 [5;1H[?25h[?25l[26;56H6,53[6;53H[?25h[?25l[26;56H7,1 [7;1H[?25h[?25l[26;56H8,28[8;28H[?25h[?25l[26;56H9,3 [9;3H[?25h[?25l[26;56H10,31[10;31H[?25h[?25l[26;57H1,12[11;12H[?25h[?25l[26;57H2[12;12H[?25h[?25l[26;57H3,40[13;40H[?25h[?25l[26;57H4,53[14;53H[?25h[?25l[26;57H5,19[15;19H[?25h[?25l[26;60H8[15;18H[?25h[?25l[26;60H7[15;17H[?25h[?25l[26;60H6[15;16H[?25h[?25l[26;60H5[15;15H[?25h[?25l[26;60H4[15;14H[?25h[?25l[26;60H3[15;13H[?25h[?25l[26;60H2[15;12H[?25h[?25l[26;60H1[15;11H[?25h[?25l[26;60H0[15;10H[?25h[?25l[26;59H9 [15;9H[?25h[?25l[26;59H8[15;8H[?25h[?25l[26;59H7[15;7H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H7[15;7H[?25h[?25l[26;59H8[15;8H[?25h[?25l[26;59H7[15;7H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H5[15;5H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H7[15;7H[?25h[?25l[35m$main[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;59H8[15;8H[?25h[?25lmain [38;5;130m"[m[35m$file[m[38;5;130m"[m[15;19H[K[26;59H7[15;7H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H5[15;5H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H7[15;7H[?25h[?25l[26;59H8[15;8H[?25h[?25l[26;59H7[15;7H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H7[15;7H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H5[15;5H[?25h[?25l[26;59H6[15;6H[?25h[?25l[26;59H7[15;7H[?25h[?25lmain [38;5;130m"[m[35m$file[m[38;5;130m"[m[15;18H[K[26;59H6[15;6H[?25h[?25lmain [38;5;130m"[m[35m$file[m[38;5;130m"[m[15;17H[K[26;59H5[15;5H[?25h[?25l[35m$main[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;59H6[15;6H[?25h[?25l[1C[35mmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;59H7[15;7H[?25h[?25l[35mamain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;59H8[15;8H[?25h[?25l[35mimain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;59H9[15;9H[?25h[?25l[35mnmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;59H10[15;10H[?25h[?25l[35mfmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H1[15;11H[?25h[?25l[35mimain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H2[15;12H[?25h[?25l[35mlmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H3[15;13H[?25h[?25l[35memain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H4[15;14H[?25h[?25l[35mpmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H5[15;15H[?25h[?25l[35mamain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H6[15;16H[?25h[?25l[35mtmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H7[15;17H[?25h[?25l[35mhmain[m [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H8[15;18H[?25h[?25l/main [38;5;130m"[m[35m$file[m[38;5;130m"[m[26;60H9[15;19H[?25h[26;1H[K[15;18H[?25l[26;46H^[[15;18H[26;46H  [15;19H[26;56H15,18[9CAll[15;18H[?25h[?25l[26;46H:[15;18H[26;46H[K[26;1H:[?25hwq[?25l[?2004l[>4;m"script.sh" 16L, 362B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l[23;0;0t]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ls
+[?2004l[0m[01;32mscript.sh[0m  [01;34mtest[0m
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  sc[K[K./script.sh ~aycock/[K[K[K[K[K[K[K[K[K
+[?2004lMain file path (e.g. ./src): ~aycock/411/TEST/ref	 ference/main
+Test file path (e.g. ./test): ./test
+
+
+Semantic checking file ./test/empty.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main/main: No such file or directory
+
+
+Semantic checking file ./test/scope1.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main/main: No such file or directory
+
+
+Semantic checking file ./test/scope2.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main/main: No such file or directory
+
+
+Semantic checking file ./test/simple1.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main/main: No such file or directory
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  cat ~![K[K[K[K[K[Kls ~aycock/411/TEST/reference/
+[?2004l[0m[01;32marraymodule.so[0m      [01;32m_codecs_kr.so[0m        [01;32m_multibytecodecmodule.so[0m
+[01;32mbinascii.so[0m         [01;32m_codecs_tw.so[0m        [01;32mstropmodule.so[0m
+[01;32mbz2.so[0m              [01;32mitertoolsmodule.so[0m   [01;32m_struct.so[0m
+[01;32m_codecs_cn.so[0m       [01;32mlibpython2.6.so.1.0[0m  [01;32municodedata.so[0m
+[01;32m_codecs_hk.so[0m       [01;32mlibpython2.7.so.1.0[0m  [01;32mzlibmodule.so[0m
+[01;32m_codecs_iso2022.so[0m  [01;32m_localemodule.so[0m
+[01;32m_codecs_jp.so[0m       [01;32mmain[0m
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ls ~aycock/411/TEST/reference/[19P./script.sh
+[?2004lMain file path (e.g. ./src): ~at ycock/411/TEST/reference
+Test file path (e.g. ./test): ./  text	  st	    ./test
+
+
+Semantic checking file ./test/empty.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main: No such file or directory
+
+
+Semantic checking file ./test/scope1.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main: No such file or directory
+
+
+Semantic checking file ./test/scope2.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main: No such file or directory
+
+
+Semantic checking file ./test/simple1.test
+=================================================
+./script.sh: line 15: ~aycock/411/TEST/reference/main: No such file or directory
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  cat ~[K[K[K[K[Kls [K[K[K~at[Kycock/34[K[K5[K4``[K[K11/TEST/reference/main ./test/simple1.test 
+[?2004lerror: no return statement in non-void function 'foo'
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004hchristopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3$  ~aycock/411/TEST/reference/main ./test/simple1.test [C[1P[1@2
+[?2004l./test/simple2.test: No such file or directory
+]0;christopher.schul1@csx:~/Courses/CPSC411/my-awesome-compiler/Milestone3[?2004
