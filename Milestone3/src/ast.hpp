@@ -1,8 +1,10 @@
 #ifndef AST_HPP
 #define AST_HPP
 
+#include <unordered_map>
 #include <vector>
 #include <string>
+#include <memory>
 
 using namespace std;
 
@@ -13,6 +15,12 @@ class ASTNode {
         string type;
         int lineno;
         string attr;
+
+        // TODO: populate this via Traversal class.
+        std::unordered_map<std::string, std::string>* sym_table_entry;
+
+        // todo: test this out.
+        // std::unique_ptr<std::unordered_map<std::string, std::string>> sym;
         
         vector<ASTNode*> children;
         

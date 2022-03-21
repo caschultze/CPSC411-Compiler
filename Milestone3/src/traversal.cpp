@@ -2,32 +2,56 @@
 
 #include "traversal.hpp"
 
-// Checks the scope stack for a symbol table key that matches the given name.
-// Returns false when the name is not found.
-bool Traversal::lookupName(std::string name) {
+// Check top of scope stack for a symbol table key that matches the given name.
+// Returns true when key is found.
+// TODO: error when name is already defined
+bool Traversal::isDefinedInTopScope(std::string name) {
+    if (scope_stack.top().find(name) != scope_stack.top().end()) {
+        return 0;
+    }
+    return 1;
+}
+
+// Check scope stack for a symbol table key that matches the given name.
+// Returns true when key is found.
+// TODO: error when name is not found
+bool Traversal::isUndefinedInAllScopes(std::string name) {
 
     std::stack<std::unordered_map<std::string, std::unordered_map<std::string, std::string>>> clone = scope_stack;
 
     while (!clone.empty()) {
         if (clone.top().find(name) != clone.top().end()) {
-            return 0;
+            return 1;
         }
         clone.pop();
     }
-    return 1;
+    return 0;
 }
 
+
+// TODO:
+// When creating an STab entry for an ASTNode, 
+//     Ensure the ASTNode with the given 'id' has the stab pointer stored to property "sym_table_entry".
+// Make sure that the record (the STab entry) can be access without issue, even after it has been popped from the scope stack.
+
+
 void Traversal::pushPredefinedIds() {
+    // unordered_map<std::string, std::unique_ptr<unordered_map<std::string, std::string>>> sym_table;
+    // std::unique_ptr<unordered_map<std::string, std::string>> entry
+
+
+
+    // sym_table["getchar"] = entry;
+
     unordered_map<std::string, unordered_map<std::string, std::string>> sym_table;
     unordered_map<std::string, std::string> entry;
-
-    //TODO: figure out how 'sym' from reference compiler is integrated.
 
     entry["attr"] = "getchar";
     entry["sig"] = "f()";
     entry["type"] = "id";
     sym_table["getchar"] = entry;
     entry.clear();
+    std::cout << sym_table["getchar"]["attr"] << std::endl;
 
     entry["attr"] = "halt";
     entry["sig"] = "f()";
@@ -79,6 +103,36 @@ void Traversal::traverse() {
     // Fourth traversal
 
     // postorder(root, pass1_cb);
+
+
+    // When I an obj pop from the stack, the reference for its pointer is deleted.
+    // I need to make sure to keep a copy of it.
+    ASTNode* x = new ASTNode("hello");
+    x->sym_table_entry = &scope_stack.top()["getchar"];
+
+    std:: cout << x->sym_table_entry << std::endl;
+    std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
+
+    while (!scope_stack.empty()) {
+
+        scope_stack.pop();
+    }
+
+    std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
+
+    // ASTNode* x = new ASTNode("hello");
+    // x->sym = &scope_stack.top()["getchar"];
+
+    // std:: cout << x->sym_table_entry << std::endl;
+    // std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
+
+    // while (!scope_stack.empty()) {
+
+    //     scope_stack.pop();
+    // }
+
+    // std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
+    
 }
 
 void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {

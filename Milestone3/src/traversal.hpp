@@ -22,9 +22,16 @@ class Traversal {
         static void pass4_cb(ASTNode*);
 
 
-        std::stack<std::unordered_map<std::string, unordered_map<std::string, std::string>>> scope_stack; 
+        std::stack<std::unordered_map<std::string, unordered_map<std::string, std::string>>> scope_stack;
+        // std::stack<std::unordered_map<  std::string, 
+        //                                 std::unique_ptr<
+        //                                     unordered_map<std::string, std::string>
+        //                                 >
+        //                             >
+        // > scope_stack;
 
-        bool lookupName(std::string);
+        bool isDefinedInTopScope(std::string);
+        bool isUndefinedInAllScopes(std::string);
         void pushPredefinedIds();
 
         
