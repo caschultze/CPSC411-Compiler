@@ -16,6 +16,8 @@ namespace JMM {
 
         private:
             ASTNode* root;
+
+            void cb_1(int);
     };
 
 }
