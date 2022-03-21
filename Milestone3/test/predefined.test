@@ -1,8 +1,8 @@
 main() {
     getchar();
     halt();
-    printb();
-    printc();
-    printi();
-    prints();
+    printb(true);
+    printc(0);
+    printi(0);
+    prints("hello");
 }
