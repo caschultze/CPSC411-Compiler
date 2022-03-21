@@ -2,39 +2,83 @@
 
 #include "traversal.hpp"
 
-Traversal::Traversal (ASTNode* _root) {
-    root = _root;
+// Checks the scope stack for a symbol table key that matches the given name.
+// Returns false when the name is not found.
+bool Traversal::lookupName(std::string name) {
 
-    pushPredefinedIds();
+    std::stack<std::unordered_map<std::string, std::unordered_map<std::string, std::string>>> clone = scope_stack;
+
+    while (!clone.empty()) {
+        if (clone.top().find(name) != clone.top().end()) {
+            return 0;
+        }
+        clone.pop();
+    }
+    return 1;
 }
 
 void Traversal::pushPredefinedIds() {
-    // unordered_map<std::string, unordered_map<std::string, std::string>> sym_table;
+    unordered_map<std::string, unordered_map<std::string, std::string>> sym_table;
+    unordered_map<std::string, std::string> entry;
 
-    // unordered_map<std::string, std::string> entry;
-    // entry["attr"] = "getchar";
-    // // entry["sym"] = ???
-    // entry["sig"] = "f(int)"
-    // //sym_table["getchar"] = 
-    // // sym_table["halt"] = 
-    // // sym_table["printb"] = 
-    // // sym_table["printc"] = 
-    // // sym_table["printi"] = 
-    // // sym_table["prints"] = 
+    //TODO: figure out how 'sym' from reference compiler is integrated.
 
-    // scope_stack.push(sym_table);
+    entry["attr"] = "getchar";
+    entry["sig"] = "f()";
+    entry["type"] = "id";
+    sym_table["getchar"] = entry;
+    entry.clear();
+
+    entry["attr"] = "halt";
+    entry["sig"] = "f()";
+    entry["type"] = "id";
+    sym_table["halt"] = entry;
+    entry.clear();
+
+    entry["attr"] = "printb";
+    entry["sig"] = "f(boolean)";
+    entry["type"] = "id";
+    sym_table["printb"] = entry;
+    entry.clear();
+
+    entry["attr"] = "printc";
+    entry["sig"] = "f(int)";
+    entry["type"] = "id";
+    sym_table["printc"] = entry;
+    entry.clear();
+
+    entry["attr"] = "printi";
+    entry["sig"] = "f(int)";
+    entry["type"] = "id";
+    sym_table["halt"] = entry;
+    entry.clear();
+
+    entry["attr"] = "prints";
+    entry["sig"] = "f(string)";
+    entry["type"] = "id";
+    sym_table["prints"] = entry;
+    entry.clear();
+
+    scope_stack.push(sym_table);
 }
+
+
+Traversal::Traversal (ASTNode* _root) {
+    root = _root;
+}
+
 
 void Traversal::traverse() {
 
     // Populate scope_stack with predefined IDs.
+    pushPredefinedIds();
 
     // First traversal
     // Second traversal
     // Third traversal
     // Fourth traversal
 
-    postorder(root, pass1_cb);
+    // postorder(root, pass1_cb);
 }
 
 void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {

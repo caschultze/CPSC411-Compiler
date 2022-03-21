@@ -23,6 +23,8 @@ class Traversal {
 
 
         std::stack<std::unordered_map<std::string, unordered_map<std::string, std::string>>> scope_stack; 
+
+        bool lookupName(std::string);
         void pushPredefinedIds();
 
         
