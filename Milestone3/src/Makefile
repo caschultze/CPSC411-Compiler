@@ -3,7 +3,7 @@
 
 CC := g++
 CXXFLAGS := -Wall
-objs := semantic_checker.o parser.o scanner.o driver.o main.o ast.o
+objs := traversal.o semantic_checker.o parser.o scanner.o driver.o main.o ast.o 
 
 all: main
 
