@@ -18,6 +18,7 @@ bool Driver::start(istream &in)
         return 1;
     }
     bool res = parse(in);
+    //tree->print();
     if (!res) res = semanticCheck();
     //if (!res) annotated_tree->print();
 
@@ -48,7 +49,7 @@ bool Driver::parse(istream &in)
 bool Driver::semanticCheck() 
 {
     semantic_checker = std::make_unique<JMM::SemanticChecker>();
-    semantic_checker->setParseTree(*tree);
+    semantic_checker->setRoot(tree);
 
     if (semantic_checker->check() != 0) {
         cerr << "Semantic check failed!!" << endl;

@@ -12,10 +12,10 @@ namespace JMM {
             virtual ~SemanticChecker() = default;
 
             bool check();
-            void setParseTree(ASTNode _parse_tree);
+            void setRoot(ASTNode* _root);
 
         private:
-            ASTNode parse_tree;
+            ASTNode* root;
     };
 
 }

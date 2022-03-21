@@ -6,15 +6,16 @@
 
 using namespace std;
 
-// ASTNodes are nodes of an abract syntax tree. 
+// ASTNodes are nodes of an abstract syntax tree. 
 // The parser uses these to generate an AST for tokens caught by the scanner.
 class ASTNode {
     public:
-        vector<ASTNode> children;
         string type;
         int lineno;
         string attr;
-
+        
+        vector<ASTNode*> children;
+        
         ASTNode() {}
         ~ASTNode() {}
 
@@ -36,9 +37,9 @@ class ASTNode {
 // This class simply has a vector of ASTNodes.
 class ASTNodeCollection {
     public:
-        vector<ASTNode> nodes;
+        vector<ASTNode*> nodes;
         ASTNodeCollection() {}
-        void AddNode(ASTNode _node) { nodes.push_back(_node); } 
+        void AddNode(ASTNode* _node) { nodes.push_back(_node); } 
 };
 
 #endif

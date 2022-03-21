@@ -74,7 +74,7 @@
 start                       : %empty                { driver.tree = new ASTNode("program"); }
                             | globaldeclarations    {   
                                                         driver.tree = new ASTNode("program");
-                                                        for (auto node : $1->nodes)
+                                                        for (ASTNode* node : $1->nodes)
                                                             driver.tree->children.push_back(node);
                                                     }
                             ;
@@ -91,10 +91,10 @@ type                        : BOOLEAN               { $$ = new ASTNode("boolean"
 
 globaldeclarations          : globaldeclaration                         { 
                                                                             $$ = new ASTNodeCollection();
-                                                                            $$->AddNode(*$1); 
+                                                                            $$->AddNode($1); 
                                                                         }
                             | globaldeclarations globaldeclaration      { 
-                                                                            $1->AddNode(*$2);
+                                                                            $1->AddNode($2);
                                                                             $$ = $1;
                                                                         }
                             ;
@@ -109,8 +109,8 @@ globaldeclaration           : variabledeclaration           {
 
 variabledeclaration         : type identifier ";"       {
                                                             $$ = new ASTNode("varDecl", @1.begin.line);
-                                                            $$->children.push_back(*$1);
-                                                            $$->children.push_back(*$2);
+                                                            $$->children.push_back($1);
+                                                            $$->children.push_back($2);
                                                         }
                             ;
 
@@ -120,22 +120,21 @@ identifier                  : ID                        { $$ = new ASTNode("id",
 functiondeclaration         : functionheader block                      { 
                                                                             $$ = new ASTNode("funcDecl", @1.begin.line);
                                                                     
-                                                                            for (auto node : $1->nodes)
+                                                                            for (ASTNode* node : $1->nodes)
                                                                                 $$->children.push_back(node);
 
-                                                                            $$->children.push_back(*$2);
+                                                                            $$->children.push_back($2);
                                                                         }
                             ;
 functionheader              : type functiondeclarator                   {
                                                                             $$ = new ASTNodeCollection();
-                                                                            $$->AddNode(*$1);
-                                                                            for (auto node : $2->nodes)
+                                                                            $$->AddNode($1);
+                                                                            for (ASTNode* node : $2->nodes)
                                                                                 $$->AddNode(node);
                                                                         }
                             | VOID functiondeclarator                   {   
                                                                             $$ = new ASTNodeCollection();
-                                                                            auto x = new ASTNode("void", @1.begin.line);
-                                                                            $$->AddNode(*x);
+                                                                            $$->AddNode(new ASTNode("void", @1.begin.line));
                                                                             for (auto node : $2->nodes)
                                                                                 $$->AddNode(node);
                                                                         }
@@ -143,68 +142,61 @@ functionheader              : type functiondeclarator                   {
 
 functiondeclarator          : identifier "(" formalparameterlist ")"    {
                                                                             $$ = new ASTNodeCollection();
-                                                                            $$->AddNode(*$1);
+                                                                            $$->AddNode($1);
 
-                                                                            auto x = new ASTNode("formals");
-                                                                            for (auto node : $3->nodes)
-                                                                                x->children.push_back(node);
-
-                                                                            $$->AddNode(*x);
+                                                                            ASTNode* formals = new ASTNode("formals");
+                                                                            for (ASTNode* node : $3->nodes)
+                                                                                formals->children.push_back(node);
+                                                                            $$->AddNode(formals);
                                                                         }
                             | identifier "(" ")"                        { 
                                                                             $$ = new ASTNodeCollection();
-                                                                            $$->AddNode(*$1);
-                                                                            auto x = new ASTNode("formals");
-                                                                            $$->AddNode(*x);
-
-                                                                            
+                                                                            $$->AddNode($1);
+                                                                            $$->AddNode(new ASTNode("formals"));                                     
                                                                         }
                             ;
 
 
 formalparameterlist         : formalparameter                           {
                                                                             $$ = new ASTNodeCollection();
-                                                                            $$->AddNode(*$1);
+                                                                            $$->AddNode($1);
                                                                         }
                             | formalparameterlist "," formalparameter   { 
                                                                             $$ = $1;
-                                                                            $$->AddNode(*$3);
+                                                                            $$->AddNode($3);
                                                                         }
                             ;
 
 formalparameter             : type identifier                           {
                                                                             $$ = new ASTNode("formal", @1.begin.line);
-                                                                            $$->children.push_back(*$1);
-                                                                            $$->children.push_back(*$2);
+                                                                            $$->children.push_back($1);
+                                                                            $$->children.push_back($2);
                                                                         }
                             ;
 
 mainfunctiondeclaration     : mainfunctiondeclarator block      {   
                                                                     $$ = new ASTNode("mainDecl", @1.begin.line);
 
-                                                                    auto x = new ASTNode("void");
-                                                                    $$->children.push_back(*x);
+                                                                    $$->children.push_back(new ASTNode("void"));
 
-                                                                    for (auto node : $1->nodes)
+                                                                    for (ASTNode* node : $1->nodes)
                                                                         $$->children.push_back(node);
 
-                                                                    auto y = new ASTNode("formals");
-                                                                    $$->children.push_back(*y);
+                                                                    $$->children.push_back(new ASTNode("formals"));
 
-                                                                    $$->children.push_back(*$2);
+                                                                    $$->children.push_back($2);
                                                                 }
                             ;
 
 mainfunctiondeclarator      : identifier "(" ")"                                {
                                                                                     $$ = new ASTNodeCollection();
-                                                                                    $$->AddNode(*$1);
+                                                                                    $$->AddNode($1);
                                                                                 }
                             ;
 
 block                       : "{" blockstatements "}"                           {
                                                                                     $$ = new ASTNode("block");
-
-                                                                                    for (auto node : $2->nodes)
+                                                                                    for (ASTNode* node : $2->nodes)
                                                                                         $$->children.push_back(node);
                                                                                 }
                             | "{" "}"                                           { $$ = new ASTNode("block"); }
@@ -213,18 +205,18 @@ block                       : "{" blockstatements "}"                           
 blockstatements             : blockstatement                                    { $$ = $1; }                                    
                             | blockstatements blockstatement                    {
                                                                                     $$ = $1;
-                                                                                    for (auto node : $2->nodes)
+                                                                                    for (ASTNode* node : $2->nodes)
                                                                                         $$->AddNode(node);
                                                                                 }
                             ;
 
 blockstatement              : variabledeclaration                               {
                                                                                     $$ = new ASTNodeCollection();
-                                                                                    $$->AddNode(*$1);
+                                                                                    $$->AddNode($1);
                                                                                 }                             
                             | statement                                         {
                                                                                     $$ = new ASTNodeCollection();
-                                                                                    $$->AddNode(*$1);
+                                                                                    $$->AddNode($1);
                                                                                 }
                             ;
 
@@ -234,34 +226,34 @@ statement                   : block                                             
                             | BREAK ";"                                         { $$ = new ASTNode("break", @1.begin.line); }
                             | RETURN expression ";"                             {
                                                                                     $$ = new ASTNode("return", @1.begin.line);
-                                                                                    $$->children.push_back(*$2);
+                                                                                    $$->children.push_back($2);
                                                                                 }
                             | RETURN ";"                                        { $$ = new ASTNode("return", @1.begin.line); }
                             | IF "(" expression ")" statement                   { 
                                                                                     $$ = new ASTNode("if", @1.begin.line);
-                                                                                    $$->children.push_back(*$3);
-                                                                                    $$->children.push_back(*$5);
+                                                                                    $$->children.push_back($3);
+                                                                                    $$->children.push_back($5);
                                                                                 }
                             | IF "(" expression ")" statement ELSE statement    { 
                                                                                     $$ = new ASTNode("ifElse", @1.begin.line); 
-                                                                                    $$->children.push_back(*$3);
-                                                                                    $$->children.push_back(*$5);
-                                                                                    $$->children.push_back(*$7);
+                                                                                    $$->children.push_back($3);
+                                                                                    $$->children.push_back($5);
+                                                                                    $$->children.push_back($7);
                                                                                 }
                             | WHILE "(" expression ")" statement                {
                                                                                     $$ = new ASTNode("while", @1.begin.line);
-                                                                                    $$->children.push_back(*$3);
-                                                                                    $$->children.push_back(*$5);
+                                                                                    $$->children.push_back($3);
+                                                                                    $$->children.push_back($5);
                                                                                 }    
                             ;
 
 statementexpression         : assignment                                        {
                                                                                     $$ = new ASTNode("stmtExpr", @1.begin.line);
-                                                                                    $$->children.push_back(*$1);
+                                                                                    $$->children.push_back($1);
                                                                                 }
                             | functioninvocation                                {   
                                                                                     $$ = new ASTNode("stmtExpr", @1.begin.line);
-                                                                                    $$->children.push_back(*$1);
+                                                                                    $$->children.push_back($1);
                                                                                 }
                             ;
 
@@ -272,31 +264,28 @@ primary                     : literal                                           
 
 argumentlist                : expression                                            { 
                                                                                         $$ = new ASTNodeCollection();
-                                                                                        $$->AddNode(*$1); 
+                                                                                        $$->AddNode($1); 
                                                                                     }
                             | argumentlist "," expression                           {
                                                                                         $$ = $1;
-                                                                                        $$->AddNode(*$3);
+                                                                                        $$->AddNode($3);
                                                                                     }
                             ;
 
 functioninvocation          : identifier "(" argumentlist ")"                       { 
                                                                                         $$ = new ASTNode("funcCall", @1.begin.line);
-                                                                                        $$->children.push_back(*$1);
+                                                                                        $$->children.push_back($1);
 
-                                                                                        auto x = new ASTNode("actuals");
-                                                                                        for (auto node : $3->nodes)
-                                                                                            x->children.push_back(node);
-                                                                                        $$->children.push_back(*x);
+                                                                                        ASTNode* actuals = new ASTNode("actuals");
+                                                                                        for (ASTNode* node : $3->nodes)
+                                                                                            actuals->children.push_back(node);
+                                                                                        $$->children.push_back(actuals);
 
                                                                                     }
                             | identifier "(" ")"                                    {
                                                                                         $$ = new ASTNode("funcCall", @1.begin.line);
-                                                                                        $$->children.push_back(*$1);
-
-                                                                                        auto x = new ASTNode("actuals");
-                                                                                        $$->children.push_back(*x);
-
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back(new ASTNode("actuals"));
                                                                                     }
                             ;
 
@@ -312,12 +301,12 @@ unaryexpression             : "-" unaryexpression                               
                                                                                             $$ = $2;
                                                                                         } else {
                                                                                             $$ = new ASTNode("-", @1.begin.line);
-                                                                                            $$->children.push_back(*$2);
+                                                                                            $$->children.push_back($2);
                                                                                         }
                                                                                     }
                             | "!" unaryexpression                                   { 
                                                                                         $$ = new ASTNode("!", @1.begin.line);
-                                                                                        $$->children.push_back(*$2);
+                                                                                        $$->children.push_back($2);
                                                                                     }
                             | postfixexpression                                     { $$ = $1; }
                             ;
@@ -325,83 +314,83 @@ unaryexpression             : "-" unaryexpression                               
 multiplicativeexpression    : unaryexpression                                       { $$ = $1; }
                             | multiplicativeexpression "*" unaryexpression          { 
                                                                                         $$ = new ASTNode("*", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | multiplicativeexpression "/" unaryexpression          { 
                                                                                         $$ = new ASTNode("/", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | multiplicativeexpression "%" unaryexpression          { 
                                                                                         $$ = new ASTNode("%", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 
 additiveexpression          : multiplicativeexpression                              { $$ = $1; }
                             | additiveexpression "+" multiplicativeexpression       { 
                                                                                         $$ = new ASTNode("+", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | additiveexpression "-" multiplicativeexpression       { 
                                                                                         $$ = new ASTNode("-", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 
 relationalexpression        : additiveexpression                                    { $$ = $1; }
                             | relationalexpression "<" additiveexpression           {   
                                                                                         $$ = new ASTNode("<", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | relationalexpression ">" additiveexpression           { 
                                                                                         $$ = new ASTNode(">", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | relationalexpression "<=" additiveexpression          { 
                                                                                         $$ = new ASTNode("<=", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | relationalexpression ">=" additiveexpression          { 
                                                                                         $$ = new ASTNode(">=", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 
 equalityexpression          : relationalexpression                                  { $$ = $1; }
                             | equalityexpression "==" relationalexpression          { 
                                                                                         $$ = new ASTNode("==", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             | equalityexpression "!=" relationalexpression          { 
                                                                                         $$ = new ASTNode("!=", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 
 conditionalandexpression    : equalityexpression                                    { $$ = $1; }
                             | conditionalandexpression "&&" equalityexpression      { 
                                                                                         $$ = new ASTNode("&&", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 
 conditionalorexpression     : conditionalandexpression                              { $$ = $1; }
                             | conditionalorexpression "||" conditionalorexpression  { 
                                                                                         $$ = new ASTNode("||", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 
@@ -411,8 +400,8 @@ assignmentexpression        : conditionalorexpression                           
 
 assignment                  : identifier "=" assignmentexpression                   {
                                                                                         $$ = new ASTNode("=", @2.begin.line);
-                                                                                        $$->children.push_back(*$1);
-                                                                                        $$->children.push_back(*$3);
+                                                                                        $$->children.push_back($1);
+                                                                                        $$->children.push_back($3);
                                                                                     }
                             ;
 

@@ -19,7 +19,7 @@ void ASTNode::print() {
         cout << "}" << endl;
 
         for (auto x : children) {
-            x.print(num_tabs+1);
+            x->print(num_tabs+1);
         }
     }
 }
@@ -75,7 +75,7 @@ void ASTNode::print(int num_tabs)
         cout << "}" << endl;
 
         for (auto x : children) {
-            x.print(num_tabs+1);
+            x->print(num_tabs+1);
         }
     }
 }

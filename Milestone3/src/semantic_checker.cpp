@@ -4,6 +4,6 @@ bool JMM::SemanticChecker::check() {
     return 0;
 }
 
-void JMM::SemanticChecker::setParseTree(ASTNode _parse_tree) {
-    parse_tree = _parse_tree;
+void JMM::SemanticChecker::setRoot(ASTNode* _root) {
+    root = _root;
 }
