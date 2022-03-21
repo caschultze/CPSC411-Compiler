@@ -2,46 +2,98 @@
 
 #include "traversal.hpp"
 
-void Traversal::traverse(ASTNode* root) {
-    postorder(root, cb_1);
+Traversal::Traversal (ASTNode* _root) {
+    root = _root;
+
+    pushPredefinedIds();
 }
 
-void Traversal::postorder(ASTNode* node, void(*callback)()) {
+void Traversal::pushPredefinedIds() {
+    // unordered_map<std::string, unordered_map<std::string, std::string>> sym_table;
+
+    // unordered_map<std::string, std::string> entry;
+    // entry["attr"] = "getchar";
+    // // entry["sym"] = ???
+    // entry["sig"] = "f(int)"
+    // //sym_table["getchar"] = 
+    // // sym_table["halt"] = 
+    // // sym_table["printb"] = 
+    // // sym_table["printc"] = 
+    // // sym_table["printi"] = 
+    // // sym_table["prints"] = 
+
+    // scope_stack.push(sym_table);
+}
+
+void Traversal::traverse() {
+
+    // Populate scope_stack with predefined IDs.
+
+    // First traversal
+    // Second traversal
+    // Third traversal
+    // Fourth traversal
+
+    postorder(root, pass1_cb);
+}
+
+void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {
     
     if (node == nullptr) {
         return;
     }
     // Traverse to children.
     for (size_t i = 0; i < node->children.size(); i++) {
-        postorder(node->children[i], cb_2);
+        postorder(node->children[i], pass1_cb);
     }
     // Action to take after traversing.
-    // std::cout << node->type << std::endl;
-    callback();
+    callback(node);
 }
 
-void Traversal::prepostorder(ASTNode* node, void(*preorder_cb)(), void(*postorder_cb)()) {
+void Traversal::prepostorder(ASTNode* node, void(*callback1)(ASTNode*), void(*callback2)(ASTNode*)) {
     if (node == nullptr) {
         return;
     }
 
     // Action to take before traversing.
-    preorder_cb();
+    callback1(node);
     
     // Traverse to children.
     for (size_t i = 0; i < node->children.size(); i++) {
-        prepostorder(node->children[i], cb_2, cb_2);
+        prepostorder(node->children[i], pass1_cb, pass1_cb);
     }
 
     // Action to take after traversing.
-    postorder_cb();
+    callback2(node);
 }
 
-void Traversal::cb_1() {
+void Traversal::pass1_cb(ASTNode* node) {
     std::cout << "Hello cb1!" << std::endl;
+    // switch (node->type) {
+    //     default: 
+    //         ;
+    // }
 }
-void Traversal::cb_2() {
+void Traversal::pass2_cb(ASTNode* node) {
      std::cout << "Hello cb2!" << std::endl;
+     // switch (node->type) {
+    //     default: 
+    //         ;
+    // }
+}
+void Traversal::pass3_cb(ASTNode* node) {
+    std::cout << "Hello cb3!" << std::endl;
+    // switch (node->type) {
+    //     default: 
+    //         ;
+    // }
+}
+void Traversal::pass4_cb(ASTNode* node) {
+    std::cout << "Hello cb4!" << std::endl;
+    // switch (node->type) {
+    //     default: 
+    //         ;
+    // }
 }
 
 

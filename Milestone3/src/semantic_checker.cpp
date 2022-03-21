@@ -5,8 +5,8 @@
 
 bool JMM::SemanticChecker::check() {
 
-    Traversal* t = new Traversal();
-    t->traverse(root);
+    Traversal* t = new Traversal(root);
+    t->traverse();
 
     return 0;
 }

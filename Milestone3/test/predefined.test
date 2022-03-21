@@ -1,0 +1,8 @@
+main() {
+    getchar();
+    halt();
+    printb();
+    printc();
+    printi();
+    prints();
+}
