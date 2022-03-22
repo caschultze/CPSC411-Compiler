@@ -3,48 +3,27 @@
 
 #include "traversal.hpp"
 
-// Check top of scope stack for a symbol table key that matches the given name.
-// Returns true when key is found.
-// TODO: error when name is already defined
-// bool Traversal::isDefinedInTopScope(std::string name) {
-//     if (scope_stack.top().find(name) != scope_stack.top().end()) {
-//         return 0;
-//     }
-//     return 1;
-// }
-
-// Check scope stack for a symbol table key that matches the given name.
-// Returns true when key is found.
-// TODO: error when name is not found
-void Traversal::lookupNameInStack(std::string name) {
-
-    auto clone = scope_stack;
-    bool first = true;
-
-    // Search for name on stack.
-    while (!clone.empty()) {
-        // Check if name is in current scope.
-        if (scope_stack.top().find(name) != scope_stack.top().end()) {
-            // If it is already defined in innermost scope, there is a redefined error.
-            if (first) {
-                std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
-                exit(1);
-            }
-            first = false;
-        }
-        clone.pop();
+bool Traversal::nameExistsInCurrentScope(std::string name) {
+    if (scope_stack.top().find(name) != scope_stack.top().end()) {
+        return false;
     }
-    // Name was not found on stack.
-    std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
+    std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
     exit(1);
 }
 
-
-// TODO:
-// When creating an STab entry for an ASTNode, 
-//     Ensure the ASTNode with the given 'id' has the stab pointer stored to property "sym_table_entry".
-// Make sure that the record (the STab entry) can be access without issue, even after it has been popped from the scope stack.
-
+// Checks scope stack for a symbol table key that matches the given name.
+bool Traversal::nameExistsInScopeStack(std::string name) {
+    auto clone = scope_stack;
+    while (!clone.empty()) {
+        if (clone.top().find(name) != clone.top().end()) {
+            // TODO: figure out what to do when name has been found.
+            return true;
+        }
+        clone.pop();
+    }
+    std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
+    exit(1);
+}
 
 void Traversal::pushPreDefinedNames() {
 

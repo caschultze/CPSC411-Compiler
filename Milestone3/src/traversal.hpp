@@ -28,8 +28,11 @@ class Traversal {
 
         // bool isDefinedInTopScope(std::string);
         // bool isUndefinedInAllScopes(std::string);
-        void lookupNameInStack(std::string);
         void pushPreDefinedNames();
+
+        bool nameExistsInCurrentScope(std::string);
+        bool nameExistsInScopeStack(std::string);
+
 
         
 };
