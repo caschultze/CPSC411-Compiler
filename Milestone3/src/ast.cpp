@@ -12,10 +12,27 @@ void ASTNode::print() {
         if (lineno > 0){
             cout << ", 'lineno': " << lineno;
         }
-        
+
         if (attr != "") {
              cout << ", 'attr': '" << attr << "'";
         }
+
+        if (sym_table_entry != nullptr) {
+            if (type == "program") {
+                cout << ", 'startSymbol': <stab.Symbol instance at " << sym_table_entry.get() << ">";
+            } else {
+                cout << ", 'sym': <stab.Symbol instance at " << sym_table_entry.get() << ">";
+            }
+        }
+
+        if (sig != "") {
+            cout << ", 'sig': '" << sig << "'";
+        }
+
+        if (return_type != "") {
+            cout << ", 'ret': '" << return_type << "'";
+        }
+
         cout << "}" << endl;
 
         for (auto x : children) {
@@ -70,6 +87,22 @@ void ASTNode::print(int num_tabs)
                 }
             }
             cout << "'";
+        }
+
+        if (sym_table_entry != nullptr) {
+            if (type == "program") {
+                cout << ", 'startSymbol': <stab.Symbol instance at " << sym_table_entry.get() << ">";
+            } else {
+                cout << ", 'sym': <stab.Symbol instance at " << sym_table_entry.get() << ">";
+            }
+        }
+
+        if (sig != "") {
+            cout << ", 'sig': '" << sig << "'";
+        }
+
+        if (return_type != "") {
+            cout << ", 'ret': '" << return_type << "'";
         }
 
         cout << "}" << endl;

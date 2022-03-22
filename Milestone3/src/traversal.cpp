@@ -3,20 +3,68 @@
 
 #include "traversal.hpp"
 
-bool Traversal::nameExistsInCurrentScope(std::string name) {
-    if (scope_stack.top().find(name) != scope_stack.top().end()) {
-        return false;
-    }
-    std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
-    exit(1);
+Traversal::Traversal (ASTNode* _root) {
+    root = _root;
 }
 
-// Checks scope stack for a symbol table key that matches the given name.
-bool Traversal::nameExistsInScopeStack(std::string name) {
-    auto clone = scope_stack;
+// Initialize static variables.
+int Traversal::mainDecl_count;
+std::unordered_map<std::string, std::string> Traversal::scope_entry;
+std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>> Traversal::scope;
+std::stack<std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>>> Traversal::scope_stack;
+ASTNode* Traversal::id_node_ptr;
+std::vector<std::string> Traversal::synth_attributes;
+std::vector<std::string> Traversal::synth_func_sig;
+
+
+void Traversal::pushPreDefinedNames() {
+
+    Traversal::scope_entry["sig"] = "f()";
+    Traversal::scope_entry["return_type"] = "int";
+    Traversal::scope["getchar"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+    Traversal::scope_entry.clear();
+
+    Traversal::scope_entry["sig"] = "f()";
+    Traversal::scope_entry["return_type"] = "void";
+    Traversal::scope["halt"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+    Traversal::scope_entry.clear();
+
+    Traversal::scope_entry["sig"] = "f(boolean)";
+    Traversal::scope_entry["return_type"] = "void";
+    Traversal::scope["printb"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+    Traversal::scope_entry.clear();
+
+    Traversal::scope_entry["sig"] = "f(int)";
+    Traversal::scope_entry["return_type"] = "void";
+    Traversal::scope["printc"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+    Traversal::scope_entry.clear();
+
+    Traversal::scope_entry["sig"] = "f(int)";
+    Traversal::scope_entry["return_type"] = "void";
+    Traversal::scope["printi"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+    Traversal::scope_entry.clear();
+
+    Traversal::scope_entry["sig"] = "f(string)";
+    Traversal::scope_entry["return_type"] = "void";
+    Traversal::scope["prints"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+    Traversal::scope_entry.clear();
+
+    Traversal::scope_stack.push(Traversal::scope);
+
+}
+
+bool Traversal::doesNotExistInTopOfScopeStack(std::string name) {
+    if ( Traversal::scope_stack.top().find(name) ==  Traversal::scope_stack.top().end() ) {
+        std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
+        exit(1);
+    }
+    return true;
+}
+
+bool Traversal::existsInScopeStack(std::string name) {
+    auto clone = Traversal::scope_stack;
     while (!clone.empty()) {
         if (clone.top().find(name) != clone.top().end()) {
-            // TODO: figure out what to do when name has been found.
             return true;
         }
         clone.pop();
@@ -25,83 +73,58 @@ bool Traversal::nameExistsInScopeStack(std::string name) {
     exit(1);
 }
 
-void Traversal::pushPreDefinedNames() {
-
-    std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>> scope;
-    std::unordered_map<std::string, std::string> scope_entry;
-
-    scope_entry["attr"] = "getchar";
-    scope_entry["sig"] = "f()";
-    scope_entry["type"] = "id";
-    scope["getchar"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
-    scope_entry.clear();
-
-    scope_entry["attr"] = "halt";
-    scope_entry["sig"] = "f()";
-    scope_entry["type"] = "id";
-    scope["halt"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
-    scope_entry.clear();
-
-    scope_entry["attr"] = "printb";
-    scope_entry["sig"] = "f(boolean)";
-    scope_entry["type"] = "id";
-    scope["printb"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
-    scope_entry.clear();
-
-    scope_entry["attr"] = "printc";
-    scope_entry["sig"] = "f(int)";
-    scope_entry["type"] = "id";
-    scope["printc"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
-    scope_entry.clear();
-
-    scope_entry["attr"] = "printi";
-    scope_entry["sig"] = "f(int)";
-    scope_entry["type"] = "id";
-    scope["printi"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
-    scope_entry.clear();
-
-    scope_entry["attr"] = "prints";
-    scope_entry["sig"] = "f(string)";
-    scope_entry["type"] = "id";
-    scope["prints"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
-    scope_entry.clear();
-
-    scope_stack.push(scope);
-
-}
-
-
-Traversal::Traversal (ASTNode* _root) {
-    root = _root;
-}
-
 
 void Traversal::traverse() {
 
     // Populate scope_stack with predefined IDs.
-    pushPreDefinedNames();
+    Traversal::pushPreDefinedNames();
 
-    // First traversal
+    // // Print predefined signatures on top of scope stack.
+    // while (!Traversal::scope_stack.empty()) {
+    //     for (auto const &pair: Traversal::scope_stack.top()) {
+    //         std::cout << "{" << pair.first << ": " << pair.second->at("sig") << "}\n";
+    //     }
+    //     Traversal::scope_stack.pop();
+    // }
+
+    // // Check if a name exists on top of scope stack.
+    // if (Traversal::nameDoesNotExistInTopOfScopeStack("prints")) {
+    //     std::cout << "found prints" << std::endl;
+    // } else {
+    //     std::cout << "failed to find prints" << std:: endl;
+    // }
+    
+    // // Check if a name exists in scope stack.
+    // if (Traversal::existsInScopeStack("prints2")) {
+    //     std::cout << "found prints" << std::endl;
+    // } else {
+    //     std::cout << "failed to find prints" << std:: endl;
+    // }
+
+    // First traversal.
+    Traversal::scope.clear();
+    postorder(root, pass1_cb);
+    if (Traversal::mainDecl_count == 0) {std::cerr << "Semantic error: no main declaration" << std::endl; exit(1); }
+    if (Traversal::mainDecl_count > 1) {std::cerr << "Semantic error: multiple main declarations" << std::endl; exit(1); }
+
     // Second traversal
     // Third traversal
     // Fourth traversal
 
-    // postorder(root, pass1_cb);
-
-    // Sample code to reference a Node's STab reference.
+    // // Sample code to reference a Node's STab reference.
     // ASTNode* x = new ASTNode("hello");
     // x->sym_table_entry = scope_stack.top()["getchar"];
-    // //std:: cout << x->sym_table_entry->at("attr") << std::endl;
-    // //std:: cout << scope_stack.top()["getchar"]->at("attr") << std::endl;
-    // // std::cout << x->sym_table_entry.get() << std::endl;
-    // // std::cout << scope_stack.top()["getchar"].get() << std::endl;
+    // //std:: cout << x->sym_table_entry->at("sig") << std::endl;
+    // //std:: cout << scope_stack.top()["getchar"]->at("sig") << std::endl;
+    // std::cout << x->sym_table_entry.get() << std::endl;
+    // std::cout << scope_stack.top()["getchar"].get() << std::endl;
     // while (!scope_stack.empty()) {
     //     scope_stack.pop();
     // }
-    // //std:: cout << x->sym_table_entry->at("attr") << std::endl;
-    // //std:: cout << scope_stack.top()["getchar"]->at("attr") << std::endl;
-    // // std::cout << x->sym_table_entry.get() << std::endl;
-    // // std::cout << scope_stack.top()["getchar"].get() << std::endl;
+    // //std:: cout << x->sym_table_entry->at("sig") << std::endl;
+    // //std:: cout << scope_stack.top()["getchar"]->at("sig") << std::endl;
+    // std::cout << x->sym_table_entry.get() << std::endl;
+    // std::cout << scope_stack.top()["getchar"].get() << std::endl;
 
     
 
@@ -112,90 +135,148 @@ void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {
     if (node == nullptr) {
         return;
     }
-    // Traverse to children.
     for (size_t i = 0; i < node->children.size(); i++) {
         postorder(node->children[i], pass1_cb);
     }
-    // Action to take after traversing.
     callback(node);
 }
 
-void Traversal::prepostorder(ASTNode* node, void(*callback1)(ASTNode*), void(*callback2)(ASTNode*)) {
-    if (node == nullptr) {
-        return;
-    }
 
-    // Action to take before traversing.
-    callback1(node);
-    
-    // Traverse to children.
-    for (size_t i = 0; i < node->children.size(); i++) {
-        prepostorder(node->children[i], pass1_cb, pass1_cb);
-    }
 
-    // Action to take after traversing.
-    callback2(node);
-}
+// void Traversal::prepostorder(ASTNode* node, void(*callback1)(ASTNode*), void(*callback2)(ASTNode*)) {
+//     if (node == nullptr) {
+//         return;
+//     }
+//     callback1(node);
+//     for (size_t i = 0; i < node->children.size(); i++) {
+//         prepostorder(node->children[i], pass1_cb, pass1_cb);
+//     }
+//     callback2(node);
+// }
 
 void Traversal::pass1_cb(ASTNode* node) {
-    std::cout << "Hello cb1!" << std::endl;
-    // switch (node->type) {
-    //     default: 
-    //         ;
-    // }
+    if (node->type == "int" || node->type == "bool" || node->type == "void") {
+        node->sig = node->type;
+        Traversal::synth_attributes.push_back(node->type);
+    }
+    else if (node->type == "id") {
+        Traversal::synth_attributes.push_back(node->attr);
+        Traversal::id_node_ptr = node;
+    }
+    else if (node->type == "formal") {
+        // todo: lookup if an entry already exists in scope
+        std::string formal_id = Traversal::synth_attributes.end()[-1];
+        std::string formal_type = Traversal::synth_attributes.end()[-2];
+
+        node->sig = formal_type;
+
+        Traversal::synth_func_sig.push_back(formal_type);
+
+        Traversal::scope_entry["sig"] = formal_type;
+        Traversal::scope[formal_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+        Traversal::scope_entry.clear();
+
+        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[formal_id];
+        Traversal::id_node_ptr->sig = Traversal::scope[formal_id]->at("sig");
+
+        Traversal::id_node_ptr = nullptr;
+        Traversal::synth_attributes.clear();
+    }
+    else if (node->type == "mainDecl") {
+        Traversal::mainDecl_count++;
+
+        std::string mainDecl_id = Traversal::synth_attributes.end()[-1];
+        std::string mainDecl_return_type = Traversal::synth_attributes.end()[-2];
+        std::string mainDecl_sig = "f(";
+        bool first = true;
+        for (size_t i = 0; i < Traversal::synth_func_sig.size(); i++) {
+            if (!first) mainDecl_sig.append(",");
+            mainDecl_sig.append(Traversal::synth_func_sig[i]);
+        }
+        mainDecl_sig.append(")");
+
+        Traversal::scope_entry["return_type"] = mainDecl_return_type;
+        Traversal::scope_entry["sig"] = mainDecl_sig;
+        Traversal::scope[mainDecl_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+        Traversal::scope_entry.clear();
+
+        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[mainDecl_id];
+        Traversal::id_node_ptr->sig = Traversal::scope[mainDecl_id]->at("sig");
+        Traversal::id_node_ptr->return_type = Traversal::scope[mainDecl_id]->at("return_type");
+
+        Traversal::id_node_ptr = nullptr;
+        Traversal::synth_attributes.clear();
+    }
+    else if (node->type == "globVarDecl") {
+        std::string globVarDecl_id = Traversal::synth_attributes.end()[-1];
+        std::string globVarDecl_type = Traversal::synth_attributes.end()[-2];
+
+        Traversal::scope_entry["sig"] = globVarDecl_type;
+        Traversal::scope[globVarDecl_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+        Traversal::scope_entry.clear();
+
+        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[globVarDecl_id];
+        Traversal::id_node_ptr->sig = scope[globVarDecl_id]->at("sig");
+
+        Traversal::id_node_ptr = nullptr;
+        Traversal::synth_attributes.clear();
+        Traversal::synth_func_sig.clear();
+    }
+    else if (node->type == "funcDecl") {
+        std::string funcDecl_id = Traversal::synth_attributes.end()[-1];
+        std::string funcDecl_return_type = Traversal::synth_attributes.end()[-2];
+        std::string funcDecl_sig = "f(";
+        bool first = true;
+        for (size_t i = 0; i < Traversal::synth_func_sig.size(); i++) {
+            if (!first) funcDecl_sig.append(",");
+            funcDecl_sig.append(Traversal::synth_func_sig[i]);
+        }
+        funcDecl_sig.append(")");
+
+        Traversal::scope_entry["return_type"] = funcDecl_return_type;
+        Traversal::scope_entry["sig"] = funcDecl_sig;
+        Traversal::scope[funcDecl_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+        Traversal::scope_entry.clear();
+
+        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[funcDecl_id];
+        Traversal::id_node_ptr->sig = Traversal::scope[funcDecl_id]->at("sig");
+        Traversal::id_node_ptr->return_type = Traversal::scope[funcDecl_id]->at("return_type");
+
+
+        Traversal::id_node_ptr = nullptr;
+        Traversal::synth_attributes.clear();
+        Traversal::synth_func_sig.clear();
+    }
+    else if (node->type == "program") {
+        Traversal::scope_entry["$"] = "$";
+        Traversal::scope["$"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+        Traversal::scope_entry.clear();
+
+        node->sym_table_entry = Traversal::scope["$"];
+        Traversal::scope_stack.push(Traversal::scope);
+    }
 }
-void Traversal::pass2_cb(ASTNode* node) {
-     std::cout << "Hello cb2!" << std::endl;
-     // switch (node->type) {
-    //     default: 
-    //         ;
-    // }
-}
-void Traversal::pass3_cb(ASTNode* node) {
-    std::cout << "Hello cb3!" << std::endl;
-    // switch (node->type) {
-    //     default: 
-    //         ;
-    // }
-}
-void Traversal::pass4_cb(ASTNode* node) {
-    std::cout << "Hello cb4!" << std::endl;
-    // switch (node->type) {
-    //     default: 
-    //         ;
-    // }
-}
 
 
-
-
-
-// void Traversal::postorder(ASTNode* node) {
-//     if (node == nullptr) {
-//         return;
-//     }
-
-//     // Traverse to children.
-//     for (size_t i = 0; i < node->children.size(); i++) {
-//         postorder(node->children[i]);
-//     }
-
-//     // Action to take after traversing.
-//     std::cout << node->type << std::endl;
+// void Traversal::pass2_cb(ASTNode* node) {
+//      std::cout << "Hello cb2!" << std::endl;
+//      // switch (node->type) {
+//     //     default: 
+//     //         ;
+//     // }
 // }
-
-// void Traversal::preorder(ASTNode* node) {
-//     if (node == nullptr) {
-//         return;
-//     }
-
-//     // Action to take before traversing.
-//     std::cout << node->type << std::endl;
-
-//     // Traverse to children.
-//     for (size_t i = 0; i < node->children.size(); i++) {
-//         preorder(node->children[i]);
-//     }
+// void Traversal::pass3_cb(ASTNode* node) {
+//     std::cout << "Hello cb3!" << std::endl;
+//     // switch (node->type) {
+//     //     default: 
+//     //         ;
+//     // }
 // }
-
+// void Traversal::pass4_cb(ASTNode* node) {
+//     std::cout << "Hello cb4!" << std::endl;
+//     // switch (node->type) {
+//     //     default: 
+//     //         ;
+//     // }
+// }
 

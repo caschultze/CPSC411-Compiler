@@ -20,7 +20,8 @@ class ASTNode {
         // std::unordered_map<std::string, std::string>* sym_table_entry;
         // todo: test this out.
         std::shared_ptr<std::unordered_map<std::string, std::string>> sym_table_entry;
-
+        string sig;
+        string return_type;
         
         vector<ASTNode*> children;
         

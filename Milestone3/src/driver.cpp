@@ -19,7 +19,11 @@ bool Driver::start(istream &in)
     }
     bool res = parse(in);
     //tree->print();
+
     if (!res) res = semanticCheck();
+    std::cout << "Annotated tree: " << std::endl;
+    tree->print();
+    
     //if (!res) annotated_tree->print();
 
     return res;
