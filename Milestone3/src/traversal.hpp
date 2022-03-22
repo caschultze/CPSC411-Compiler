@@ -25,6 +25,7 @@ class Traversal {
         static std::vector<std::string> synth_func_sig;
 
         static void pushPreDefinedNames();
+        static bool doesNotExistInCurrentScope(std::string);
         static bool doesNotExistInTopOfScopeStack(std::string);
         static bool existsInScopeStack(std::string);
 

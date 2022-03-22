@@ -1,0 +1,5 @@
+void a(int a) {}
+
+void b(int main) {}
+
+main() {}

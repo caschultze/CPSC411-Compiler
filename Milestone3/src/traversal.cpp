@@ -55,8 +55,16 @@ void Traversal::pushPreDefinedNames() {
 
 bool Traversal::doesNotExistInTopOfScopeStack(std::string name) {
     if ( Traversal::scope_stack.top().find(name) ==  Traversal::scope_stack.top().end() ) {
-        std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
-        exit(1);
+        return false;
+        // std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
+        // exit(1);
+    }
+    return true;
+}
+
+bool Traversal::doesNotExistInCurrentScope(std::string name) {
+    if ( Traversal::scope.find(name) != Traversal::scope.end() ) {
+        return false;
     }
     return true;
 }
@@ -69,8 +77,9 @@ bool Traversal::existsInScopeStack(std::string name) {
         }
         clone.pop();
     }
-    std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
-    exit(1);
+    // std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
+    // exit(1);
+    return false;
 }
 
 
@@ -197,8 +206,14 @@ void Traversal::pass1_cb(ASTNode* node) {
 
         Traversal::scope_entry["return_type"] = mainDecl_return_type;
         Traversal::scope_entry["sig"] = mainDecl_sig;
-        Traversal::scope[mainDecl_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
-        Traversal::scope_entry.clear();
+
+        if (Traversal::doesNotExistInCurrentScope(id_node_ptr->attr)) {
+            Traversal::scope[id_node_ptr->attr] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+            Traversal::scope_entry.clear();
+        } else {
+            std::cerr << "Semantic error: '" << id_node_ptr->attr << "' redefined at line " << id_node_ptr->lineno << std::endl;
+            exit(1);
+        }
 
         Traversal::id_node_ptr->sym_table_entry = Traversal::scope[mainDecl_id];
         Traversal::id_node_ptr->sig = Traversal::scope[mainDecl_id]->at("sig");
@@ -212,8 +227,13 @@ void Traversal::pass1_cb(ASTNode* node) {
         std::string globVarDecl_type = Traversal::synth_attributes.end()[-2];
 
         Traversal::scope_entry["sig"] = globVarDecl_type;
-        Traversal::scope[globVarDecl_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
-        Traversal::scope_entry.clear();
+        if (Traversal::doesNotExistInCurrentScope(id_node_ptr->attr)) {
+            Traversal::scope[id_node_ptr->attr] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+            Traversal::scope_entry.clear();
+        } else {
+            std::cerr << "Semantic error: '" << id_node_ptr->attr << "' redefined at line " << id_node_ptr->lineno << std::endl;
+            exit(1);
+        }
 
         Traversal::id_node_ptr->sym_table_entry = Traversal::scope[globVarDecl_id];
         Traversal::id_node_ptr->sig = scope[globVarDecl_id]->at("sig");
@@ -235,13 +255,18 @@ void Traversal::pass1_cb(ASTNode* node) {
 
         Traversal::scope_entry["return_type"] = funcDecl_return_type;
         Traversal::scope_entry["sig"] = funcDecl_sig;
-        Traversal::scope[funcDecl_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
-        Traversal::scope_entry.clear();
+
+        if (Traversal::doesNotExistInCurrentScope(id_node_ptr->attr)) {
+            Traversal::scope[id_node_ptr->attr] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
+            Traversal::scope_entry.clear();
+        } else {
+            std::cerr << "Semantic error: '" << id_node_ptr->attr << "' redefined at line " << id_node_ptr->lineno << std::endl;
+            exit(1);
+        }
 
         Traversal::id_node_ptr->sym_table_entry = Traversal::scope[funcDecl_id];
         Traversal::id_node_ptr->sig = Traversal::scope[funcDecl_id]->at("sig");
         Traversal::id_node_ptr->return_type = Traversal::scope[funcDecl_id]->at("return_type");
-
 
         Traversal::id_node_ptr = nullptr;
         Traversal::synth_attributes.clear();
@@ -249,6 +274,7 @@ void Traversal::pass1_cb(ASTNode* node) {
     }
     else if (node->type == "program") {
         Traversal::scope_entry["$"] = "$";
+
         Traversal::scope["$"] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
         Traversal::scope_entry.clear();
 
