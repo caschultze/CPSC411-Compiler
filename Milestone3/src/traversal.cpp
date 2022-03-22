@@ -116,9 +116,9 @@ void Traversal::traverse() {
     if (Traversal::mainDecl_count == 0) {std::cerr << "Semantic error: no main declaration" << std::endl; exit(1); }
     if (Traversal::mainDecl_count > 1) {std::cerr << "Semantic error: multiple main declarations" << std::endl; exit(1); }
 
-    // Second traversal
-    // Third traversal
-    // Fourth traversal
+    // TODO: Second traversal
+    // TODO: Third traversal
+    // TODO: Fourth traversal
 
     // // Sample code to reference a Node's STab reference.
     // ASTNode* x = new ASTNode("hello");
@@ -173,6 +173,7 @@ void Traversal::pass1_cb(ASTNode* node) {
         Traversal::id_node_ptr = node;
     }
     else if (node->type == "formal") {
+
         // todo: lookup if an entry already exists in scope
         std::string formal_id = Traversal::synth_attributes.end()[-1];
         std::string formal_type = Traversal::synth_attributes.end()[-2];

@@ -1,3 +1,4 @@
-void a(int b, int b) {}
+//void a(int b) {}
 
+void printb(int i) { }
 main() {}
