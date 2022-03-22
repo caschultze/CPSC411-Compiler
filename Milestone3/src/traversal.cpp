@@ -1,31 +1,42 @@
 #include <iostream>
+#include <memory>
 
 #include "traversal.hpp"
 
 // Check top of scope stack for a symbol table key that matches the given name.
 // Returns true when key is found.
 // TODO: error when name is already defined
-bool Traversal::isDefinedInTopScope(std::string name) {
-    if (scope_stack.top().find(name) != scope_stack.top().end()) {
-        return 0;
-    }
-    return 1;
-}
+// bool Traversal::isDefinedInTopScope(std::string name) {
+//     if (scope_stack.top().find(name) != scope_stack.top().end()) {
+//         return 0;
+//     }
+//     return 1;
+// }
 
 // Check scope stack for a symbol table key that matches the given name.
 // Returns true when key is found.
 // TODO: error when name is not found
-bool Traversal::isUndefinedInAllScopes(std::string name) {
+void Traversal::lookupNameInStack(std::string name) {
 
-    std::stack<std::unordered_map<std::string, std::unordered_map<std::string, std::string>>> clone = scope_stack;
+    auto clone = scope_stack;
+    bool first = true;
 
+    // Search for name on stack.
     while (!clone.empty()) {
-        if (clone.top().find(name) != clone.top().end()) {
-            return 1;
+        // Check if name is in current scope.
+        if (scope_stack.top().find(name) != scope_stack.top().end()) {
+            // If it is already defined in innermost scope, there is a redefined error.
+            if (first) {
+                std::cerr << "Semantic error: name is already defined in scope - \'" << name << "\'" << std::endl;
+                exit(1);
+            }
+            first = false;
         }
         clone.pop();
     }
-    return 0;
+    // Name was not found on stack.
+    std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
+    exit(1);
 }
 
 
@@ -35,55 +46,49 @@ bool Traversal::isUndefinedInAllScopes(std::string name) {
 // Make sure that the record (the STab entry) can be access without issue, even after it has been popped from the scope stack.
 
 
-void Traversal::pushPredefinedIds() {
-    // unordered_map<std::string, std::unique_ptr<unordered_map<std::string, std::string>>> sym_table;
-    // std::unique_ptr<unordered_map<std::string, std::string>> entry
+void Traversal::pushPreDefinedNames() {
 
+    std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>> scope;
+    std::unordered_map<std::string, std::string> scope_entry;
 
+    scope_entry["attr"] = "getchar";
+    scope_entry["sig"] = "f()";
+    scope_entry["type"] = "id";
+    scope["getchar"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
+    scope_entry.clear();
 
-    // sym_table["getchar"] = entry;
+    scope_entry["attr"] = "halt";
+    scope_entry["sig"] = "f()";
+    scope_entry["type"] = "id";
+    scope["halt"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
+    scope_entry.clear();
 
-    unordered_map<std::string, unordered_map<std::string, std::string>> sym_table;
-    unordered_map<std::string, std::string> entry;
+    scope_entry["attr"] = "printb";
+    scope_entry["sig"] = "f(boolean)";
+    scope_entry["type"] = "id";
+    scope["printb"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
+    scope_entry.clear();
 
-    entry["attr"] = "getchar";
-    entry["sig"] = "f()";
-    entry["type"] = "id";
-    sym_table["getchar"] = entry;
-    entry.clear();
-    std::cout << sym_table["getchar"]["attr"] << std::endl;
+    scope_entry["attr"] = "printc";
+    scope_entry["sig"] = "f(int)";
+    scope_entry["type"] = "id";
+    scope["printc"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
+    scope_entry.clear();
 
-    entry["attr"] = "halt";
-    entry["sig"] = "f()";
-    entry["type"] = "id";
-    sym_table["halt"] = entry;
-    entry.clear();
+    scope_entry["attr"] = "printi";
+    scope_entry["sig"] = "f(int)";
+    scope_entry["type"] = "id";
+    scope["printi"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
+    scope_entry.clear();
 
-    entry["attr"] = "printb";
-    entry["sig"] = "f(boolean)";
-    entry["type"] = "id";
-    sym_table["printb"] = entry;
-    entry.clear();
+    scope_entry["attr"] = "prints";
+    scope_entry["sig"] = "f(string)";
+    scope_entry["type"] = "id";
+    scope["prints"] = std::make_shared<std::unordered_map<std::string, std::string>>(scope_entry);
+    scope_entry.clear();
 
-    entry["attr"] = "printc";
-    entry["sig"] = "f(int)";
-    entry["type"] = "id";
-    sym_table["printc"] = entry;
-    entry.clear();
+    scope_stack.push(scope);
 
-    entry["attr"] = "printi";
-    entry["sig"] = "f(int)";
-    entry["type"] = "id";
-    sym_table["halt"] = entry;
-    entry.clear();
-
-    entry["attr"] = "prints";
-    entry["sig"] = "f(string)";
-    entry["type"] = "id";
-    sym_table["prints"] = entry;
-    entry.clear();
-
-    scope_stack.push(sym_table);
 }
 
 
@@ -95,7 +100,7 @@ Traversal::Traversal (ASTNode* _root) {
 void Traversal::traverse() {
 
     // Populate scope_stack with predefined IDs.
-    pushPredefinedIds();
+    pushPreDefinedNames();
 
     // First traversal
     // Second traversal
@@ -104,35 +109,23 @@ void Traversal::traverse() {
 
     // postorder(root, pass1_cb);
 
-
-    // When I an obj pop from the stack, the reference for its pointer is deleted.
-    // I need to make sure to keep a copy of it.
-    ASTNode* x = new ASTNode("hello");
-    x->sym_table_entry = &scope_stack.top()["getchar"];
-
-    std:: cout << x->sym_table_entry << std::endl;
-    std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
-
-    while (!scope_stack.empty()) {
-
-        scope_stack.pop();
-    }
-
-    std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
-
+    // Sample code to reference a Node's STab reference.
     // ASTNode* x = new ASTNode("hello");
-    // x->sym = &scope_stack.top()["getchar"];
-
-    // std:: cout << x->sym_table_entry << std::endl;
-    // std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
-
+    // x->sym_table_entry = scope_stack.top()["getchar"];
+    // //std:: cout << x->sym_table_entry->at("attr") << std::endl;
+    // //std:: cout << scope_stack.top()["getchar"]->at("attr") << std::endl;
+    // // std::cout << x->sym_table_entry.get() << std::endl;
+    // // std::cout << scope_stack.top()["getchar"].get() << std::endl;
     // while (!scope_stack.empty()) {
-
     //     scope_stack.pop();
     // }
+    // //std:: cout << x->sym_table_entry->at("attr") << std::endl;
+    // //std:: cout << scope_stack.top()["getchar"]->at("attr") << std::endl;
+    // // std::cout << x->sym_table_entry.get() << std::endl;
+    // // std::cout << scope_stack.top()["getchar"].get() << std::endl;
 
-    // std:: cout << (*x->sym_table_entry)["attr"] << std::endl;
     
+
 }
 
 void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {

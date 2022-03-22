@@ -17,10 +17,10 @@ class ASTNode {
         string attr;
 
         // TODO: populate this via Traversal class.
-        std::unordered_map<std::string, std::string>* sym_table_entry;
-
+        // std::unordered_map<std::string, std::string>* sym_table_entry;
         // todo: test this out.
-        // std::unique_ptr<std::unordered_map<std::string, std::string>> sym;
+        std::shared_ptr<std::unordered_map<std::string, std::string>> sym_table_entry;
+
         
         vector<ASTNode*> children;
         
