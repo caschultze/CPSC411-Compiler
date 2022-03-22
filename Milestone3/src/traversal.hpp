@@ -20,7 +20,7 @@ class Traversal {
         static std::unordered_map<std::string, std::string> scope_entry;
         static std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>> scope;
         static std::stack<std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>>> scope_stack;
-        static ASTNode* id_node_ptr;
+        static std::vector<ASTNode*> id_node_ptrs;
         static std::vector<std::string> synth_attributes;
         static std::vector<std::string> synth_func_sig;
 

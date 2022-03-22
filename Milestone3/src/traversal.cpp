@@ -12,7 +12,7 @@ int Traversal::mainDecl_count;
 std::unordered_map<std::string, std::string> Traversal::scope_entry;
 std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>> Traversal::scope;
 std::stack<std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>>> Traversal::scope_stack;
-ASTNode* Traversal::id_node_ptr;
+std::vector<ASTNode*> Traversal::id_node_ptrs;
 std::vector<std::string> Traversal::synth_attributes;
 std::vector<std::string> Traversal::synth_func_sig;
 
@@ -165,49 +165,55 @@ void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {
 
 void Traversal::pass1_cb(ASTNode* node) {
     if (node->type == "int" || node->type == "bool" || node->type == "void") {
-        node->sig = node->type;
         Traversal::synth_attributes.push_back(node->type);
     }
     else if (node->type == "id") {
         Traversal::synth_attributes.push_back(node->attr);
-        Traversal::id_node_ptr = node;
+        Traversal::id_node_ptrs.push_back(node);
     }
     else if (node->type == "formal") {
 
-        // todo: lookup if an entry already exists in scope
+        // Get type and id attributes of formal.
         std::string formal_id = Traversal::synth_attributes.end()[-1];
-        std::string formal_type = Traversal::synth_attributes.end()[-2];
+        Traversal::synth_attributes.pop_back();
+        std::string formal_type = Traversal::synth_attributes.end()[-1];
+        Traversal::synth_attributes.pop_back();
 
-        node->sig = formal_type;
-
+        // Add formal type to functions signature.
         Traversal::synth_func_sig.push_back(formal_type);
 
-        Traversal::scope_entry["sig"] = formal_type;
-        Traversal::scope[formal_id] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
-        Traversal::scope_entry.clear();
+        // Remove id of formal from synthesized id node pointers.
+        Traversal::id_node_ptrs.pop_back();
 
-        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[formal_id];
-        Traversal::id_node_ptr->sig = Traversal::scope[formal_id]->at("sig");
-
-        Traversal::id_node_ptr = nullptr;
-        Traversal::synth_attributes.clear();
     }
     else if (node->type == "mainDecl") {
         Traversal::mainDecl_count++;
 
+        // Consume synthesized attributes.
         std::string mainDecl_id = Traversal::synth_attributes.end()[-1];
-        std::string mainDecl_return_type = Traversal::synth_attributes.end()[-2];
+        synth_attributes.pop_back();
+        std::string mainDecl_return_type = Traversal::synth_attributes.end()[-1];
+        synth_attributes.pop_back();
+
+        // Consume id node pointer.
+        ASTNode* id_node_ptr = id_node_ptrs.end()[-1];
+        id_node_ptrs.pop_back();
+
+        // Consume function declaration signature attributes.
         std::string mainDecl_sig = "f(";
         bool first = true;
         for (size_t i = 0; i < Traversal::synth_func_sig.size(); i++) {
             if (!first) mainDecl_sig.append(",");
             mainDecl_sig.append(Traversal::synth_func_sig[i]);
         }
+        Traversal::synth_func_sig.clear();
         mainDecl_sig.append(")");
 
-        Traversal::scope_entry["return_type"] = mainDecl_return_type;
+        // Populate symbol table entry.
         Traversal::scope_entry["sig"] = mainDecl_sig;
+        Traversal::scope_entry["return_type"] = mainDecl_return_type;
 
+        // Try adding symbol table entry to symbol table.
         if (Traversal::doesNotExistInCurrentScope(id_node_ptr->attr)) {
             Traversal::scope[id_node_ptr->attr] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
             Traversal::scope_entry.clear();
@@ -216,18 +222,32 @@ void Traversal::pass1_cb(ASTNode* node) {
             exit(1);
         }
 
-        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[mainDecl_id];
-        Traversal::id_node_ptr->sig = Traversal::scope[mainDecl_id]->at("sig");
-        Traversal::id_node_ptr->return_type = Traversal::scope[mainDecl_id]->at("return_type");
+        // Inform ID node of symbol table entry information.
+        id_node_ptr->sym_table_entry = Traversal::scope[mainDecl_id];
+        id_node_ptr->sig = Traversal::scope[mainDecl_id]->at("sig");
+        id_node_ptr->return_type = Traversal::scope[mainDecl_id]->at("return_type");
 
-        Traversal::id_node_ptr = nullptr;
+        // Clean up.
         Traversal::synth_attributes.clear();
+        Traversal::synth_func_sig.clear();
+
     }
     else if (node->type == "globVarDecl") {
-        std::string globVarDecl_id = Traversal::synth_attributes.end()[-1];
-        std::string globVarDecl_type = Traversal::synth_attributes.end()[-2];
 
+        // Consume synthesized attributes.
+        std::string globVarDecl_id = Traversal::synth_attributes.end()[-1];
+        synth_attributes.pop_back();
+        std::string globVarDecl_type = Traversal::synth_attributes.end()[-1];
+        synth_attributes.pop_back();
+
+        // Consume id node pointer.
+        ASTNode* id_node_ptr = id_node_ptrs.end()[-1];
+        id_node_ptrs.pop_back();
+
+        // Populate symbol table entry.
         Traversal::scope_entry["sig"] = globVarDecl_type;
+
+        // Try adding symbol table entry to symbol table.
         if (Traversal::doesNotExistInCurrentScope(id_node_ptr->attr)) {
             Traversal::scope[id_node_ptr->attr] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
             Traversal::scope_entry.clear();
@@ -236,27 +256,41 @@ void Traversal::pass1_cb(ASTNode* node) {
             exit(1);
         }
 
-        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[globVarDecl_id];
-        Traversal::id_node_ptr->sig = scope[globVarDecl_id]->at("sig");
+        // Inform ID node of symbol table entry information.
+        id_node_ptr->sym_table_entry = Traversal::scope[globVarDecl_id];
+        id_node_ptr->sig = scope[globVarDecl_id]->at("sig");
 
-        Traversal::id_node_ptr = nullptr;
+        // Clean up.
         Traversal::synth_attributes.clear();
         Traversal::synth_func_sig.clear();
     }
     else if (node->type == "funcDecl") {
+
+        // Consume synthesized attributes.
         std::string funcDecl_id = Traversal::synth_attributes.end()[-1];
-        std::string funcDecl_return_type = Traversal::synth_attributes.end()[-2];
+        synth_attributes.pop_back();
+        std::string funcDecl_return_type = Traversal::synth_attributes.end()[-1];
+        synth_attributes.pop_back();
+
+        // Consume id node pointer.
+        ASTNode* id_node_ptr = id_node_ptrs.end()[-1];
+        id_node_ptrs.pop_back();
+
+        // Consume function declaration signature attributes.
         std::string funcDecl_sig = "f(";
         bool first = true;
         for (size_t i = 0; i < Traversal::synth_func_sig.size(); i++) {
             if (!first) funcDecl_sig.append(",");
             funcDecl_sig.append(Traversal::synth_func_sig[i]);
         }
+        Traversal::synth_func_sig.clear();
         funcDecl_sig.append(")");
 
-        Traversal::scope_entry["return_type"] = funcDecl_return_type;
+        // Populate symbol table entry.
         Traversal::scope_entry["sig"] = funcDecl_sig;
+        Traversal::scope_entry["return_type"] = funcDecl_return_type;
 
+        // Try adding symbol table entry to symbol table.
         if (Traversal::doesNotExistInCurrentScope(id_node_ptr->attr)) {
             Traversal::scope[id_node_ptr->attr] = std::make_shared<std::unordered_map<std::string, std::string>>(Traversal::scope_entry);
             Traversal::scope_entry.clear();
@@ -265,11 +299,12 @@ void Traversal::pass1_cb(ASTNode* node) {
             exit(1);
         }
 
-        Traversal::id_node_ptr->sym_table_entry = Traversal::scope[funcDecl_id];
-        Traversal::id_node_ptr->sig = Traversal::scope[funcDecl_id]->at("sig");
-        Traversal::id_node_ptr->return_type = Traversal::scope[funcDecl_id]->at("return_type");
+        // Inform ID node of symbol table entry information.
+        id_node_ptr->sym_table_entry = Traversal::scope[funcDecl_id];
+        id_node_ptr->sig = Traversal::scope[funcDecl_id]->at("sig");
+        id_node_ptr->return_type = Traversal::scope[funcDecl_id]->at("return_type");
 
-        Traversal::id_node_ptr = nullptr;
+        // Clean up.
         Traversal::synth_attributes.clear();
         Traversal::synth_func_sig.clear();
     }
