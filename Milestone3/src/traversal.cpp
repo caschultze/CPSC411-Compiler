@@ -108,7 +108,7 @@ void Traversal::pass1_cb(ASTNode* node) {
 
     if (node->type == "formal") {
         for (size_t i = 0; i < node->children.size(); i++) {
-            if (node->children[i]->type == "int" || node->children[i]->type == "bool" || node->children[i]->type == "void") {
+            if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
                 synthesized_sig.push_back(node->children[i]->type);
             }
         }
@@ -121,7 +121,7 @@ void Traversal::pass1_cb(ASTNode* node) {
         std::string _sig;
 
         for (size_t i = 0; i < node->children.size(); i++) {
-            if (node->children[i]->type == "int" || node->children[i]->type == "bool" || node->children[i]->type == "void") {
+            if (node->children[i]->type == "int" || node->children[i]->type == "boolean" || node->children[i]->type == "void") {
                 _return_type = node->children[i]->type;
             }
             if (node->children[i]->type == "id") {
@@ -152,7 +152,7 @@ void Traversal::pass1_cb(ASTNode* node) {
         std::string _type;
 
         for (size_t i = 0; i < node->children.size(); i++) {
-            if (node->children[i]->type == "int" || node->children[i]->type == "bool" || node->children[i]->type == "void") {
+            if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
                 _type = node->children[i]->type;
             }
             if (node->children[i]->type == "id") {
@@ -172,7 +172,7 @@ void Traversal::pass1_cb(ASTNode* node) {
         std::string _sig;
 
         for (size_t i = 0; i < node->children.size(); i++) {
-            if (node->children[i]->type == "int" || node->children[i]->type == "bool" || node->children[i]->type == "void") {
+            if (node->children[i]->type == "int" || node->children[i]->type == "boolean" || node->children[i]->type == "void") {
                 _return_type = node->children[i]->type;
             }
             if (node->children[i]->type == "id") {
@@ -206,15 +206,57 @@ void Traversal::pass1_cb(ASTNode* node) {
 }
 
 void Traversal::pass2a_cb(ASTNode* node) {
-    // If node is a mainDecl or funcDecl, open a new scope
-    if (node->type == "mainDecl" || "funcDecl") {
+    
+    if (node->type == "mainDecl" || node->type == "funcDecl") {
         scope_stack.push(SymTab());
     }
+
+
 }
 
 void Traversal::pass2b_cb(ASTNode* node) {
-    if (node->type == "mainDecl" || "funcDecl") {
+    
+    if (node->type == "mainDecl" || node->type == "funcDecl") {
         scope_stack.pop();
+    } else if (node->type == "formal") {
+        
+        // TODO: make test case for this
+        // ASTNode* _id_child;
+        // std::string _type;
+
+        // for (size_t i = 0; i < node->children.size(); i++) {
+        //     if (node->children[i]->type == "int" || node->children[i]->type == "bool") {
+        //         _type = node->children[i]->type;
+        //     }
+        //     if (node->children[i]->type == "id") {
+        //         _id_child = node->children[i];
+        //     }
+        // }
+
+        // if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
+        //     scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
+        //     scope_stack.top()[_id_child->attr]->type = _type;
+        // }
+        // _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+
+    } else if (node->type == "varDecl") {
+        ASTNode* _id_child;
+        std::string _type;
+
+        for (size_t i = 0; i < node->children.size(); i++) {
+            if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
+                _type = node->children[i]->type;
+            }
+            if (node->children[i]->type == "id") {
+                _id_child = node->children[i];
+            }
+        }
+
+        if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
+            scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
+            scope_stack.top()[_id_child->attr]->type = _type;
+        }
+        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
     }
 }
 

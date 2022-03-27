@@ -2,7 +2,7 @@ int i;
 
 int foo() { 
     int i;
-    boolean j;
+    boolean i;
     return 0;
 }
 
