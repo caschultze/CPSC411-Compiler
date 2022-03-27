@@ -33,11 +33,15 @@ class Traversal {
         static bool existsOnTOS(std::string, int);
 
         void firstTraversal();
+        void secondTraversal();
 
-        void postorder(ASTNode*, void(*)(ASTNode*));
+        void postOrder(ASTNode*, void(*)(ASTNode*));
+        void prePostOrder(ASTNode*, void(*)(ASTNode*), void(*)(ASTNode*));
 
         static void pass1_cb(ASTNode*);
-        // static void pass2_cb(ASTNode*);
+        static void pass2a_cb(ASTNode*);
+        static void pass2b_cb(ASTNode*);
+
         // static void pass3_cb(ASTNode*);
         // static void pass4_cb(ASTNode*);
 };

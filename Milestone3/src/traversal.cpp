@@ -50,26 +50,7 @@ bool Traversal::existsOnTOS(std::string name, int err_lineno) {
     return false;
 }
 
-
-// bool Traversal::existsInScopeStack(std::string name) {
-//     auto clone = Traversal::scope_stack;
-//     while (!clone.empty()) {
-//         if (clone.top().find(name) != clone.top().end()) {
-//             return true;
-//         }
-//         clone.pop();
-//     }
-//     // std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
-//     // exit(1);
-//     return false;
-// }
-
-
 void Traversal::traverse() {
-
-    // Populate scope_stack with predefined IDs.
-    pushPreDefinedNames();
-
     // // Print predefined signatures on top of scope stack.
     // while (!Traversal::scope_stack.empty()) {
     //     for (auto const &pair: Traversal::scope_stack.top()) {
@@ -92,58 +73,35 @@ void Traversal::traverse() {
     //     std::cout << "failed to find prints" << std:: endl;
     // }
 
+    pushPreDefinedNames();
     firstTraversal();
-
-    // TODO: Second traversal
-    // TODO: Third traversal
-    // TODO: Fourth traversal
-
-    // // Sample code to reference a Node's STab reference.
-    // ASTNode* x = new ASTNode("hello");
-    // x->sym_table_entry = scope_stack.top()["getchar"];
-    // //std:: cout << x->sym_table_entry->at("sig") << std::endl;
-    // //std:: cout << scope_stack.top()["getchar"]->at("sig") << std::endl;
-    // std::cout << x->sym_table_entry.get() << std::endl;
-    // std::cout << scope_stack.top()["getchar"].get() << std::endl;
-    // while (!scope_stack.empty()) {
-    //     scope_stack.pop();
-    // }
-    // //std:: cout << x->sym_table_entry->at("sig") << std::endl;
-    // //std:: cout << scope_stack.top()["getchar"]->at("sig") << std::endl;
-    // std::cout << x->sym_table_entry.get() << std::endl;
-    // std::cout << scope_stack.top()["getchar"].get() << std::endl;
-
+    secondTraversal();
 }
 
 void Traversal::firstTraversal() {
     scope_stack.push(SymTab());
-    postorder(root, pass1_cb);
-    if (Traversal::mainDecl_count == 0) {std::cerr << "Semantic error: no main declaration" << std::endl; exit(1); }
-    if (Traversal::mainDecl_count > 1) {std::cerr << "Semantic error: multiple main declarations" << std::endl; exit(1); }
+    postOrder(root, pass1_cb);
+    if (mainDecl_count == 0) {std::cerr << "Semantic error: no main declaration" << std::endl; exit(1); }
+    if (mainDecl_count > 1) {std::cerr << "Semantic error: multiple main declarations" << std::endl; exit(1); }
+
 }
 
-void Traversal::postorder(ASTNode* node, void(*callback)(ASTNode*)) {
-    
-    if (node == nullptr) {
-        return;
-    }
-    for (size_t i = 0; i < node->children.size(); i++) {
-        postorder(node->children[i], pass1_cb);
-    }
-    callback(node);
+void Traversal::secondTraversal() {
+    prePostOrder(root, pass2a_cb, pass2b_cb);
 }
 
 
-
-// void Traversal::prepostorder(ASTNode* node, void(*callback1)(ASTNode*), void(*callback2)(ASTNode*)) {
-//     if (node == nullptr) {
-//         return;
+// bool Traversal::existsInScopeStack(std::string name) {
+//     auto clone = Traversal::scope_stack;
+//     while (!clone.empty()) {
+//         if (clone.top().find(name) != clone.top().end()) {
+//             return true;
+//         }
+//         clone.pop();
 //     }
-//     callback1(node);
-//     for (size_t i = 0; i < node->children.size(); i++) {
-//         prepostorder(node->children[i], pass1_cb, pass1_cb);
-//     }
-//     callback2(node);
+//     // std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
+//     // exit(1);
+//     return false;
 // }
 
 void Traversal::pass1_cb(ASTNode* node) {
@@ -172,9 +130,9 @@ void Traversal::pass1_cb(ASTNode* node) {
             if (node->children[i]->type == "formals") {
                 _sig = "f(";
                 bool first = true;
-                for (size_t j = 0; j < Traversal::synthesized_sig.size(); j++) {
+                for (size_t j = 0; j < synthesized_sig.size(); j++) {
                     if (!first) _sig.append(",");
-                    _sig.append(Traversal::synthesized_sig[j]);
+                    _sig.append(synthesized_sig[j]);
                     first = false;
                 }
                 _sig.append(")");
@@ -223,9 +181,9 @@ void Traversal::pass1_cb(ASTNode* node) {
             if (node->children[i]->type == "formals") {
                 _sig = "f(";
                 bool first = true;
-                for (size_t j = 0; j < Traversal::synthesized_sig.size(); j++) {
+                for (size_t j = 0; j < synthesized_sig.size(); j++) {
                     if (!first) _sig.append(",");
-                    _sig.append(Traversal::synthesized_sig[j]);
+                    _sig.append(synthesized_sig[j]);
                     first = false;
                 }
                 _sig.append(")");
@@ -247,26 +205,41 @@ void Traversal::pass1_cb(ASTNode* node) {
     }
 }
 
+void Traversal::pass2a_cb(ASTNode* node) {
+    // If node is a mainDecl or funcDecl, open a new scope
+    if (node->type == "mainDecl" || "funcDecl") {
+        scope_stack.push(SymTab());
+    }
+}
 
-// void Traversal::pass2_cb(ASTNode* node) {
-//      std::cout << "Hello cb2!" << std::endl;
-//      // switch (node->type) {
-//     //     default: 
-//     //         ;
-//     // }
-// }
-// void Traversal::pass3_cb(ASTNode* node) {
-//     std::cout << "Hello cb3!" << std::endl;
-//     // switch (node->type) {
-//     //     default: 
-//     //         ;
-//     // }
-// }
-// void Traversal::pass4_cb(ASTNode* node) {
-//     std::cout << "Hello cb4!" << std::endl;
-//     // switch (node->type) {
-//     //     default: 
-//     //         ;
-//     // }
-// }
+void Traversal::pass2b_cb(ASTNode* node) {
+    if (node->type == "mainDecl" || "funcDecl") {
+        scope_stack.pop();
+    }
+}
+
+void Traversal::postOrder(ASTNode* node, void(*callback)(ASTNode*)) {
+    
+    if (node == nullptr) {
+        return;
+    }
+    for (size_t i = 0; i < node->children.size(); i++) {
+        postOrder(node->children[i], callback);
+    }
+    callback(node);
+}
+
+void Traversal::prePostOrder(ASTNode* node, void(*callback1)(ASTNode*), void(*callback2)(ASTNode*)) {
+    if (node == nullptr) {
+        return;
+    }
+
+    callback1(node);
+
+    for (size_t i = 0; i < node->children.size(); i++) {
+        prePostOrder(node->children[i], callback1, callback2);
+    }
+
+    callback2(node);
+}
 
