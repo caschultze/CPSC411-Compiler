@@ -6,7 +6,7 @@
 
 struct SymTabEntry {
     std::string sig;
-    std::string type;
+    std::string return_type;
 };
 
 typedef std::unordered_map<std::string, std::shared_ptr<SymTabEntry>> SymTab;

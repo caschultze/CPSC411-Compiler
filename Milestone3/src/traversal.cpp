@@ -18,28 +18,28 @@ void Traversal::pushPreDefinedNames() {
     scope_stack.push(SymTab());
 
     scope_stack.top()["getchar"] = std::make_shared<SymTabEntry>();
-    scope_stack.top()["getchar"]->type = "int";
     scope_stack.top()["getchar"]->sig = "f()";
+    scope_stack.top()["getchar"]->return_type = "int";
 
     scope_stack.top()["halt"] = std::make_shared<SymTabEntry>();
-    scope_stack.top()["halt"]->type = "void";
     scope_stack.top()["halt"]->sig = "f()";
+    scope_stack.top()["halt"]->return_type = "void";
 
     scope_stack.top()["printb"] = std::make_shared<SymTabEntry>();
-    scope_stack.top()["printb"]->type = "void";
     scope_stack.top()["printb"]->sig = "f(boolean)";
+    scope_stack.top()["printb"]->return_type = "void";
 
     scope_stack.top()["printc"] = std::make_shared<SymTabEntry>();
-    scope_stack.top()["printc"]->type = "void";
     scope_stack.top()["printc"]->sig = "f(int)";
+    scope_stack.top()["printc"]->return_type = "void";
 
     scope_stack.top()["printi"] = std::make_shared<SymTabEntry>();
-    scope_stack.top()["printi"]->type = "void";
     scope_stack.top()["printi"]->sig = "f(int)";
+    scope_stack.top()["printi"]->return_type = "void";
 
     scope_stack.top()["prints"] = std::make_shared<SymTabEntry>();
-    scope_stack.top()["prints"]->type = "void";
     scope_stack.top()["prints"]->sig = "f(string)";
+    scope_stack.top()["prints"]->return_type = "void";
 }
 
 bool Traversal::existsOnTOS(std::string name, int err_lineno) {
@@ -49,6 +49,21 @@ bool Traversal::existsOnTOS(std::string name, int err_lineno) {
     }
     return false;
 }
+
+std::shared_ptr<SymTabEntry> Traversal::getSymTabEntryFromStack(std::string name, int lineno) {
+    auto clone = Traversal::scope_stack;
+
+    while (!clone.empty()) {
+        if (clone.top().find(name) != clone.top().end()) {
+            return clone.top().find(name)->second;
+        }
+        clone.pop();
+    }
+
+    std::cerr << "Semantic error: undefined name '" << name << "' at or near line " << lineno << std::endl;
+    exit(1);
+}
+
 
 void Traversal::traverse() {
     // // Print predefined signatures on top of scope stack.
@@ -76,7 +91,7 @@ void Traversal::traverse() {
     pushPreDefinedNames();
     firstTraversal();
     secondTraversal();
-    thirdTraversal();
+    //thirdTraversal();
 }
 
 void Traversal::firstTraversal() {
@@ -98,22 +113,12 @@ void Traversal::thirdTraversal() {
     postOrder(root, pass3_cb);
 }
 
-// bool Traversal::existsInScopeStack(std::string name) {
-//     auto clone = Traversal::scope_stack;
-//     while (!clone.empty()) {
-//         if (clone.top().find(name) != clone.top().end()) {
-//             return true;
-//         }
-//         clone.pop();
-//     }
-//     // std::cerr << "Semantic error: name is undefined - \'" << name << "\'" << std::endl;
-//     // exit(1);
-//     return false;
-// }
-
 void Traversal::pass1_cb(ASTNode* node) {
 
-    if (node->type == "formal") {
+    if (node->type == "void" || node->type == "boolean" || node->type == "int") {
+        node->sig = node->type;
+    }
+    else if (node->type == "formal") {
         for (size_t i = 0; i < node->children.size(); i++) {
             if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
                 synthesized_sig.push_back(node->children[i]->type);
@@ -149,18 +154,20 @@ void Traversal::pass1_cb(ASTNode* node) {
 
         if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
             scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
-            scope_stack.top()[_id_child->attr]->type = _return_type;
             scope_stack.top()[_id_child->attr]->sig = _sig;
+            scope_stack.top()[_id_child->attr]->return_type = _return_type;
+
+            _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+            _id_child->sig = _id_child->symtab_entry->sig;
         }
-        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
     }
     else if (node->type == "globVarDecl") {
         ASTNode* _id_child;
-        std::string _type;
+        std::string _sig;
 
         for (size_t i = 0; i < node->children.size(); i++) {
             if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
-                _type = node->children[i]->type;
+                _sig = node->children[i]->type;
             }
             if (node->children[i]->type == "id") {
                 _id_child = node->children[i];
@@ -169,9 +176,12 @@ void Traversal::pass1_cb(ASTNode* node) {
 
         if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
             scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
-            scope_stack.top()[_id_child->attr]->type = _type;
+            scope_stack.top()[_id_child->attr]->sig = _sig;
+
+            _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+            _id_child->sig = _id_child->symtab_entry->sig;
         }
-        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+        
     }
     else if (node->type == "funcDecl") {
         ASTNode* _id_child;
@@ -200,10 +210,12 @@ void Traversal::pass1_cb(ASTNode* node) {
 
         if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
             scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
-            scope_stack.top()[_id_child->attr]->type = _return_type;
             scope_stack.top()[_id_child->attr]->sig = _sig;
+            scope_stack.top()[_id_child->attr]->return_type = _return_type;
+
+            _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+            _id_child->sig = _id_child->symtab_entry->sig;
         }
-        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
     }
     else if (node->type == "program") {
         scope_stack.top()["$"] = std::make_shared<SymTabEntry>();
@@ -215,50 +227,39 @@ void Traversal::pass1_cb(ASTNode* node) {
 void Traversal::pass2a_cb(ASTNode* node) {
     if (node->type == "mainDecl" || node->type == "funcDecl") {
         scope_stack.push(SymTab());
+    } else if (node->type == "formal" || node->type == "varDecl") {
+
+        ASTNode* _id_child;
+        std::string _sig;
+
+        for (size_t i = 0; i < node->children.size(); i++) {
+            if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
+                _sig = node->children[i]->type;
+            }
+            if (node->children[i]->type == "id") {
+                _id_child = node->children[i];
+            }
+        }
+
+        if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
+            scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
+            scope_stack.top()[_id_child->attr]->sig = _sig;
+
+            _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+            _id_child->sig = _id_child->symtab_entry->sig;
+            node->sig = _id_child->sig;
+        }
     }
 }
 
 void Traversal::pass2b_cb(ASTNode* node) {
     if (node->type == "mainDecl" || node->type == "funcDecl") {
         scope_stack.pop();
-    } else if (node->type == "formal") {
-        
-        ASTNode* _id_child;
-        std::string _type;
-
-        for (size_t i = 0; i < node->children.size(); i++) {
-            if (node->children[i]->type == "int" || node->children[i]->type == "bool") {
-                _type = node->children[i]->type;
-            }
-            if (node->children[i]->type == "id") {
-                _id_child = node->children[i];
-            }
+    } else if (node->type == "id") {
+        if (node->symtab_entry == nullptr) {
+            node->symtab_entry = getSymTabEntryFromStack(node->attr, node->lineno);
+            node->sig = node->symtab_entry->sig;
         }
-
-        if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
-            scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
-            scope_stack.top()[_id_child->attr]->type = _type;
-        }
-        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
-
-    } else if (node->type == "varDecl") {
-        ASTNode* _id_child;
-        std::string _type;
-
-        for (size_t i = 0; i < node->children.size(); i++) {
-            if (node->children[i]->type == "int" || node->children[i]->type == "boolean") {
-                _type = node->children[i]->type;
-            }
-            if (node->children[i]->type == "id") {
-                _id_child = node->children[i];
-            }
-        }
-
-        if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
-            scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
-            scope_stack.top()[_id_child->attr]->type = _type;
-        }
-        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
     }
 }
 
@@ -270,37 +271,53 @@ void Traversal::pass3_cb(ASTNode* node) {
     // Binary boolean comparison cases
     if (node->type == "||" || node->type == "&&") {
 
+        ASTNode* left = node->children[0];
+        ASTNode* right = node->children[1];
+
+        if (left->sig != "boolean" || right->sig != "boolean") {
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
+            exit(1);
+        }
+        node->sig = "boolean";
     }
 
     // Binary int/boolean comparison cases
-    if (node->type == "==" || node->type == "!=") {
+    // if (node->type == "==" || node->type == "!=") {
 
-    }
+    // }
 
     // Binary assignment op case
     if (node->type == "=") {
 
+        ASTNode* left = node->children[0];
+        ASTNode* right = node->children[1];
+
+        if ( left->sig != right->sig ) {
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
+        node->sig = left->sig;
     }
 
-    // Binary int comparison cases
-    if (node->type == "<" || node->type == ">" || node->type == "<=" || node->type == ">=") {
+    // // Binary int comparison cases
+    // if (node->type == "<" || node->type == ">" || node->type == "<=" || node->type == ">=") {
 
-    }
+    // }
 
-    // Binary int cases
-    if (node->type == "+" || node->type == "*" || node->type == "/" || node->type == "%") {
+    // // Binary int cases
+    // if (node->type == "+" || node->type == "*" || node->type == "/" || node->type == "%") {
         
-    }
+    // }
 
-    // Unary "!" case
-    if (node->type == "!") {
-        
-    }
+    // // Unary "!" case
+    // if (node->type == "!") {
 
-    // Unary/Binary "-" case
-    if (node->type == "-") {
+    // }
 
-    }
+    // // Unary/Binary "-" case
+    // if (node->type == "-") {
+
+    // }
     
 
     

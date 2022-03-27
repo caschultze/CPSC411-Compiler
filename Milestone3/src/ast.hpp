@@ -21,7 +21,7 @@ class ASTNode {
         //std::shared_ptr<std::unordered_map<std::string, std::string>> sym_table_entry;
         std::shared_ptr<SymTabEntry> symtab_entry;
         std::string sig;
-        std::string return_type;
+        // std::string return_type;
         
         std::vector<ASTNode*> children;
         

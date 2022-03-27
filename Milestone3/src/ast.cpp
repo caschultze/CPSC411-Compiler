@@ -39,6 +39,7 @@ void ASTNode::print(int num_tabs) {
     std:: cout << "Node: { ";
     if (type != "") std::cout << "type: '" << type << "' "; 
     if (lineno > 0) std::cout << "lineno: '" << lineno << "' ";
+    if (sig != "") std::cout << "sig: '" << sig << "' ";
     if (attr != "") {
         std::cout << "attr: '";
         for (size_t i = 0; i < attr.length(); i++) {
@@ -76,7 +77,7 @@ void ASTNode::print(int num_tabs) {
     if (symtab_entry != nullptr) {
         std::cout << "symtab_entry: <'" << symtab_entry.get() << "': ";
         if (symtab_entry->sig != "") std::cout << "sig: '" << symtab_entry->sig << "' ";
-        if (symtab_entry->type != "") std::cout << "type: '" << symtab_entry->type << "'";
+        if (symtab_entry->return_type != "") std::cout << "type: '" << symtab_entry->return_type << "'";
         std::cout << "> ";
     }
     std::cout << "}" << std::endl;

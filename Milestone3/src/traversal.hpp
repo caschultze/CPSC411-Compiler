@@ -31,6 +31,7 @@ class Traversal {
 
         static void pushPreDefinedNames();
         static bool existsOnTOS(std::string, int);
+        static std::shared_ptr<SymTabEntry> getSymTabEntryFromStack(std::string, int);
 
         void firstTraversal();
         void secondTraversal();
