@@ -119,6 +119,8 @@ void Traversal::pass1_cb(ASTNode* node) {
         node->sig = node->type;
     } else if (node->type == "number") {
         node->sig = "int";
+    } else if (node->type == "true" || node->type == "false") {
+        node->sig = "boolean";
     }
     else if (node->type == "formal") {
         for (size_t i = 0; i < node->children.size(); i++) {
@@ -276,7 +278,7 @@ void Traversal::pass3_cb(ASTNode* node) {
         ASTNode* left = node->children[0];
         ASTNode* right = node->children[1];
 
-        if (left->sig != "boolean" || right->sig != "boolean") {
+        if ( !(left->sig == "boolean" && right->sig == "boolean")) {
             std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
             exit(1);
         }
@@ -284,17 +286,22 @@ void Traversal::pass3_cb(ASTNode* node) {
     }
 
     // Binary int/boolean comparison cases
-    // if (node->type == "==" || node->type == "!=") {
-
-    // }
-
-    // Binary assignment op case
-    if (node->type == "=") {
-
+    if (node->type == "==" || node->type == "!=") {
         ASTNode* left = node->children[0];
         ASTNode* right = node->children[1];
 
-        if ( left->sig != right->sig ) {
+        if ( !((left->sig == "int" && right->sig == "int") || (left->sig == "boolean" && right->sig == "boolean")) ) {
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
+            exit(1);
+        }
+        node->sig = "boolean";
+    }
+    // Binary assignment op case
+    if (node->type == "=") {
+        ASTNode* left = node->children[0];
+        ASTNode* right = node->children[1];
+
+        if ( !((left->sig == "int" && right->sig == "int") || (left->sig == "boolean" && right->sig == "boolean")) ) {
             std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
             exit(1);
         }
@@ -302,16 +309,23 @@ void Traversal::pass3_cb(ASTNode* node) {
     }
 
     // // Binary int comparison cases
-    // if (node->type == "<" || node->type == ">" || node->type == "<=" || node->type == ">=") {
+    if (node->type == "<" || node->type == ">" || node->type == "<=" || node->type == ">=") {
+        ASTNode* left = node->children[0];
+        ASTNode* right = node->children[1];
 
-    // }
+        if ( !(left->sig == "int" && right->sig == "int") ) {
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
+            exit(1);
+        }
+        node->sig = "boolean";
+    }
 
     // // Binary int cases
     if (node->type == "+" || node->type == "*" || node->type == "/" || node->type == "%") {
         ASTNode* left = node->children[0];
         ASTNode* right = node->children[1];
 
-        if (left->sig != "int" || right->sig != "int") {
+        if ( !(left->sig == "int" && right->sig == "int") ) {
             std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
             exit(1);
         }
@@ -319,18 +333,37 @@ void Traversal::pass3_cb(ASTNode* node) {
     }
 
     // // Unary "!" case
-    // if (node->type == "!") {
-
-    // }
+    if (node->type == "!") {
+        ASTNode* unary = node->children[0];
+        if ( !(unary->sig == "boolean") ) {
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Operand: " << unary->sig << std::endl;
+            exit(1);
+        }
+        node->sig = "boolean";
+    }
 
     // // Unary/Binary "-" case
-    // if (node->type == "-") {
+    if (node->type == "-") {
+        if (node->children.size() == 1) {
 
-    // }
-    
+            ASTNode* unary = node->children[0];
+            if ( !(unary->sig == "int") ) {
+                std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Operand: " << unary->sig << std::endl;
+                exit(1);
+            }
+            node->sig = "int";
 
-    
+        } else if (node->children.size() == 2) {
+            ASTNode* left = node->children[0];
+            ASTNode* right = node->children[1];
 
+            if ( !(left->sig == "int" && right->sig == "int") ) {
+                std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
+                exit(1);
+            }
+            node->sig = "int";
+        }
+    }
 }
 
 void Traversal::postOrder(ASTNode* node, void(*callback)(ASTNode*)) {
