@@ -3,6 +3,7 @@ int i;
 int foo() { 
     int i;
     boolean j;
+    return 0;
 }
 
 main() {
