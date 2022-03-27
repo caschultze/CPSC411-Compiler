@@ -1,0 +1,11 @@
+int i;
+
+int foo() { 
+    int i;
+    boolean j;
+}
+
+main() {
+    boolean i;
+    int j;
+}
