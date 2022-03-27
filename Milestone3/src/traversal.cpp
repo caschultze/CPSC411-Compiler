@@ -76,9 +76,11 @@ void Traversal::traverse() {
     pushPreDefinedNames();
     firstTraversal();
     secondTraversal();
+    thirdTraversal();
 }
 
 void Traversal::firstTraversal() {
+    // Global declarations.
     scope_stack.push(SymTab());
     postOrder(root, pass1_cb);
     if (mainDecl_count == 0) {std::cerr << "Semantic error: no main declaration" << std::endl; exit(1); }
@@ -87,9 +89,14 @@ void Traversal::firstTraversal() {
 }
 
 void Traversal::secondTraversal() {
+    // Id idenfitication.
     prePostOrder(root, pass2a_cb, pass2b_cb);
 }
 
+void Traversal::thirdTraversal() {
+    // Full type checking.
+    postOrder(root, pass3_cb);
+}
 
 // bool Traversal::existsInScopeStack(std::string name) {
 //     auto clone = Traversal::scope_stack;
@@ -206,38 +213,33 @@ void Traversal::pass1_cb(ASTNode* node) {
 }
 
 void Traversal::pass2a_cb(ASTNode* node) {
-    
     if (node->type == "mainDecl" || node->type == "funcDecl") {
         scope_stack.push(SymTab());
     }
-
-
 }
 
 void Traversal::pass2b_cb(ASTNode* node) {
-    
     if (node->type == "mainDecl" || node->type == "funcDecl") {
         scope_stack.pop();
     } else if (node->type == "formal") {
         
-        // TODO: make test case for this
-        // ASTNode* _id_child;
-        // std::string _type;
+        ASTNode* _id_child;
+        std::string _type;
 
-        // for (size_t i = 0; i < node->children.size(); i++) {
-        //     if (node->children[i]->type == "int" || node->children[i]->type == "bool") {
-        //         _type = node->children[i]->type;
-        //     }
-        //     if (node->children[i]->type == "id") {
-        //         _id_child = node->children[i];
-        //     }
-        // }
+        for (size_t i = 0; i < node->children.size(); i++) {
+            if (node->children[i]->type == "int" || node->children[i]->type == "bool") {
+                _type = node->children[i]->type;
+            }
+            if (node->children[i]->type == "id") {
+                _id_child = node->children[i];
+            }
+        }
 
-        // if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
-        //     scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
-        //     scope_stack.top()[_id_child->attr]->type = _type;
-        // }
-        // _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
+        if (!existsOnTOS(_id_child->attr, _id_child->lineno)) {
+            scope_stack.top()[_id_child->attr] = std::make_shared<SymTabEntry>();
+            scope_stack.top()[_id_child->attr]->type = _type;
+        }
+        _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
 
     } else if (node->type == "varDecl") {
         ASTNode* _id_child;
@@ -258,6 +260,51 @@ void Traversal::pass2b_cb(ASTNode* node) {
         }
         _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
     }
+}
+
+void Traversal::pass3_cb(ASTNode* node) {
+
+    // Cases to handle:
+    // ||, &&, ==, !=, =, <, >, <=, >=, +, *, /, %, !, -
+
+    // Binary boolean comparison cases
+    if (node->type == "||" || node->type == "&&") {
+
+    }
+
+    // Binary int/boolean comparison cases
+    if (node->type == "==" || node->type == "!=") {
+
+    }
+
+    // Binary assignment op case
+    if (node->type == "=") {
+
+    }
+
+    // Binary int comparison cases
+    if (node->type == "<" || node->type == ">" || node->type == "<=" || node->type == ">=") {
+
+    }
+
+    // Binary int cases
+    if (node->type == "+" || node->type == "*" || node->type == "/" || node->type == "%") {
+        
+    }
+
+    // Unary "!" case
+    if (node->type == "!") {
+        
+    }
+
+    // Unary/Binary "-" case
+    if (node->type == "-") {
+
+    }
+    
+
+    
+
 }
 
 void Traversal::postOrder(ASTNode* node, void(*callback)(ASTNode*)) {

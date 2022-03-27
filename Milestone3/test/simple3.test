@@ -1,0 +1,15 @@
+int i;
+
+int foo() { 
+    
+    boolean a;
+    boolean b;
+    boolean c;
+
+    c = a || b;
+}
+
+main() {
+    boolean i;
+    int j;
+}

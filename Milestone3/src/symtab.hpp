@@ -10,3 +10,34 @@ struct SymTabEntry {
 };
 
 typedef std::unordered_map<std::string, std::shared_ptr<SymTabEntry>> SymTab;
+
+// struct {
+//     std::string type;
+//     std::string cmd, arg1, arg2;
+// } type_check[] = {
+//     { 
+//         "+"
+//     },
+//     {
+//         "-"
+//     },
+//     {
+//         "*"
+//     },
+//     {
+//         "/"
+//     },
+//     {
+//         "<"
+//     },
+//     {
+//         ">"
+//     },
+//     {
+//         "-"
+//     },
+//     {
+//         "-"
+//     },
+
+// };

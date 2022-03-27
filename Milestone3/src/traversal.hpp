@@ -34,6 +34,7 @@ class Traversal {
 
         void firstTraversal();
         void secondTraversal();
+        void thirdTraversal();
 
         void postOrder(ASTNode*, void(*)(ASTNode*));
         void prePostOrder(ASTNode*, void(*)(ASTNode*), void(*)(ASTNode*));
@@ -41,6 +42,7 @@ class Traversal {
         static void pass1_cb(ASTNode*);
         static void pass2a_cb(ASTNode*);
         static void pass2b_cb(ASTNode*);
+        static void pass3_cb(ASTNode*);
 
         // static void pass3_cb(ASTNode*);
         // static void pass4_cb(ASTNode*);
