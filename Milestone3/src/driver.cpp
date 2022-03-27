@@ -54,7 +54,7 @@ bool Driver::semanticCheck()
 {
     semantic_checker = std::make_unique<JMM::SemanticChecker>(tree);
 
-    if (semantic_checker->check() != 0) {
+    if (!semantic_checker->check()) {
         cerr << "Semantic check failed!!" << endl;
         return 1;
     }
