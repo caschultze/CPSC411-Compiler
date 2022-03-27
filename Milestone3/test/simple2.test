@@ -1,8 +1,8 @@
 int i;
 
-int foo() { 
+int foo(int arg1) { 
     int i;
-    boolean i;
+    boolean j;
     return 0;
 }
 
