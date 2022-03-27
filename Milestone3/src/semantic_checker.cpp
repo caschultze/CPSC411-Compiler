@@ -1,17 +1,20 @@
 #include "semantic_checker.hpp"
 #include "traversal.hpp"
-
 #include <iostream>
+#include <memory>
+
+JMM::SemanticChecker::SemanticChecker(ASTNode* _root) {
+    root = _root;
+}
+JMM::SemanticChecker::~SemanticChecker() {
+    delete root;
+}
 
 bool JMM::SemanticChecker::check() {
 
-    Traversal* t = new Traversal(root);
+    std::unique_ptr<Traversal> t = std::make_unique<Traversal>(root);
     t->traverse();
 
-    return 0;
-}
-
-void JMM::SemanticChecker::setRoot(ASTNode* _root) {
-    root = _root;
+    return true;
 }
 

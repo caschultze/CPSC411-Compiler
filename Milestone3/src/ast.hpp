@@ -1,54 +1,51 @@
-#ifndef AST_HPP
-#define AST_HPP
+#pragma once
+
+#include "symtab.hpp"
 
 #include <unordered_map>
 #include <vector>
 #include <string>
 #include <memory>
 
-using namespace std;
-
 // ASTNodes are nodes of an abstract syntax tree. 
 // The parser uses these to generate an AST for tokens caught by the scanner.
 class ASTNode {
+    private:
+        void print(int);
+
     public:
-        string type;
+        std::string type;
         int lineno;
-        string attr;
+        std::string attr;
 
-        // TODO: populate this via Traversal class.
-        // std::unordered_map<std::string, std::string>* sym_table_entry;
-        // todo: test this out.
-        std::shared_ptr<std::unordered_map<std::string, std::string>> sym_table_entry;
-        string sig;
-        string return_type;
+        //std::shared_ptr<std::unordered_map<std::string, std::string>> sym_table_entry;
+        std::shared_ptr<SymTabEntry> symtab_entry;
+        std::string sig;
+        std::string return_type;
         
-        vector<ASTNode*> children;
+        std::vector<ASTNode*> children;
         
-        ASTNode() {}
-        ~ASTNode() {}
 
-        ASTNode(string _type) : type(_type) { lineno = 0; };
-        ASTNode(string _type, string _attr) : type(_type), attr(_attr) { lineno = 0; }
-        ASTNode(string _type, int _lineno) : type(_type), lineno(_lineno) {}
-        ASTNode(string _type, int _lineno, string _attr) : type(_type), lineno(_lineno), attr(_attr) {}
+        ASTNode(std::string);
+        ASTNode(std::string, int);
+        ASTNode(std::string, std::string);
+        ASTNode(std::string , int, std::string);
+        ~ASTNode();
 
-        virtual void print();
-        virtual void print(int);
+        void print();
+        // void print(int);
 
-        string GetType() { return type; }
-        void SetType(string _type) { type = _type; }
+        std::string GetType() { return type; }
+        void SetType(std::string _type) { type = _type; }
 
-        string GetAttr() { return attr; }
-        void SetAttr(string _attr) { attr = _attr; }
+        std::string GetAttr() { return attr; }
+        void SetAttr(std::string _attr) { attr = _attr; }
 };
 
 // This class simply has a vector of ASTNodes.
 class ASTNodeCollection {
     public:
-        vector<ASTNode*> nodes;
-        ASTNodeCollection() {}
-        void AddNode(ASTNode* _node) { nodes.push_back(_node); } 
+        std::vector<ASTNode*> nodes;
+        ASTNodeCollection();
+        void AddNode(ASTNode*);  
 };
-
-#endif

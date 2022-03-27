@@ -52,8 +52,7 @@ bool Driver::parse(istream &in)
 
 bool Driver::semanticCheck() 
 {
-    semantic_checker = std::make_unique<JMM::SemanticChecker>();
-    semantic_checker->setRoot(tree);
+    semantic_checker = std::make_unique<JMM::SemanticChecker>(tree);
 
     if (semantic_checker->check() != 0) {
         cerr << "Semantic check failed!!" << endl;
