@@ -1,6 +1,6 @@
 int i;
 
-int foo() { 
+void foo() { 
     
     boolean a;
     boolean b;
