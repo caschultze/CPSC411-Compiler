@@ -1,13 +1,10 @@
 int i;
 
 void foo() { 
-    
     boolean a;
     boolean b;
-    c = a || b;
-
     boolean c;
-
+    c = a || b;
 }
 
 main() {

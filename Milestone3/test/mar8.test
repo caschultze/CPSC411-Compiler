@@ -1,8 +1,9 @@
 // This test file is based on code shown during lecture on March 8
 // Purpose: check for occurence of two semantic errors
-int foo(boolean b, int i) {
+//int foo(boolean b, int i) {
+void foo(boolean b, int i) {
     int j;
-    break;
+    //break;
     j = i + k * 2;
 }
 int k;

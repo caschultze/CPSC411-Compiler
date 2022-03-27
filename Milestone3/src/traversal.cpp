@@ -91,7 +91,7 @@ void Traversal::traverse() {
     pushPreDefinedNames();
     firstTraversal();
     secondTraversal();
-    //thirdTraversal();
+    thirdTraversal();
 }
 
 void Traversal::firstTraversal() {
@@ -117,6 +117,8 @@ void Traversal::pass1_cb(ASTNode* node) {
 
     if (node->type == "void" || node->type == "boolean" || node->type == "int") {
         node->sig = node->type;
+    } else if (node->type == "number") {
+        node->sig = "int";
     }
     else if (node->type == "formal") {
         for (size_t i = 0; i < node->children.size(); i++) {
@@ -293,7 +295,7 @@ void Traversal::pass3_cb(ASTNode* node) {
         ASTNode* right = node->children[1];
 
         if ( left->sig != right->sig ) {
-            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << std::endl;
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
             exit(1);
         }
         node->sig = left->sig;
@@ -305,9 +307,16 @@ void Traversal::pass3_cb(ASTNode* node) {
     // }
 
     // // Binary int cases
-    // if (node->type == "+" || node->type == "*" || node->type == "/" || node->type == "%") {
-        
-    // }
+    if (node->type == "+" || node->type == "*" || node->type == "/" || node->type == "%") {
+        ASTNode* left = node->children[0];
+        ASTNode* right = node->children[1];
+
+        if (left->sig != "int" || right->sig != "int") {
+            std::cerr << "Semantic error: type mismatch for operator '" << node->type << "' at or near line " << node->lineno << ". Left: '" << left->sig << "' Right: '" << right->sig << "'" << std::endl;
+            exit(1);
+        }
+        node->sig = "int";
+    }
 
     // // Unary "!" case
     // if (node->type == "!") {
