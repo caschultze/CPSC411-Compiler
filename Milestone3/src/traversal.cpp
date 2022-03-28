@@ -10,6 +10,7 @@ Traversal::Traversal (ASTNode* _root) {
 // Initialize static variables.
 int Traversal::mainDecl_count;
 std::string Traversal::mainDecl_name;
+int Traversal::while_count;
 std::vector<std::string> Traversal::synthesized_sig;
 
 std::stack<SymTab> Traversal::scope_stack;
@@ -93,6 +94,7 @@ void Traversal::traverse() {
     firstTraversal();
     secondTraversal();
     thirdTraversal();
+    fourthTraversal();
 }
 
 void Traversal::firstTraversal() {
@@ -112,6 +114,11 @@ void Traversal::secondTraversal() {
 void Traversal::thirdTraversal() {
     // Full type checking.
     postOrder(root, pass3_cb);
+}
+
+void Traversal::fourthTraversal() {
+    // Handles everything else.
+    prePostOrder(root, pass4a_cb, pass4b_cb);
 }
 
 void Traversal::pass1_cb(ASTNode* node) {
@@ -404,6 +411,24 @@ void Traversal::pass3_cb(ASTNode* node) {
             }
             node->sig = "int";
         }
+    }
+}
+
+void Traversal::pass4a_cb(ASTNode* node) {
+    if (node->type == "while") {
+        Traversal::while_count++;
+    }
+}
+
+void Traversal::pass4b_cb(ASTNode* node) {
+    if (node->type == "break") {
+        if (Traversal::while_count == 0) {
+            std::cerr << "Semantic error: break must be inside while-statement at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
+    }
+    if (node->type == "while") {
+        Traversal::while_count--;
     }
 }
 

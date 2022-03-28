@@ -20,6 +20,7 @@ class Traversal {
 
         static int mainDecl_count;
         static std::string mainDecl_name;
+        static int while_count;
         //static std::unordered_map<std::string, std::string> scope_entry;
         //static std::unordered_map<std::string, std::shared_ptr<SymTabEntry>> scope;
         //static std::stack<std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>>> scope_stack;
@@ -37,6 +38,7 @@ class Traversal {
         void firstTraversal();
         void secondTraversal();
         void thirdTraversal();
+        void fourthTraversal();
 
         void postOrder(ASTNode*, void(*)(ASTNode*));
         void prePostOrder(ASTNode*, void(*)(ASTNode*), void(*)(ASTNode*));
@@ -45,7 +47,6 @@ class Traversal {
         static void pass2a_cb(ASTNode*);
         static void pass2b_cb(ASTNode*);
         static void pass3_cb(ASTNode*);
-
-        // static void pass3_cb(ASTNode*);
-        // static void pass4_cb(ASTNode*);
+        static void pass4a_cb(ASTNode*);
+        static void pass4b_cb(ASTNode*);
 };
