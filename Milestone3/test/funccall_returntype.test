@@ -1,0 +1,21 @@
+void foo() { }
+
+int bar() { return 0; }
+
+boolean gamma() { return true; }
+
+main() {
+
+    int a;
+    boolean b;
+
+    // Valid assignments
+    a = bar();
+    b = gamma();
+
+    // Invalid assignments
+    //a = foo();
+    //a = gamma();
+    //b = foo();
+    //b = foo();
+}
