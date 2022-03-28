@@ -6,15 +6,15 @@ boolean gamma() { return true; }
 
 main() {
 
-    int a;
-    boolean b;
+    //int a;
+    //boolean b;
 
     // Valid assignments
     a = bar();
-    b = gamma();
+    //b = gamma();
 
     // Invalid assignments
-    //a = foo();
+    a = foo();
     //a = gamma();
     //b = foo();
     //b = foo();

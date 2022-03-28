@@ -1,6 +1,4 @@
-void foo(int a, boolean b) {
-
-}
+void foo(int a, boolean b) { }
 
 
 main() {

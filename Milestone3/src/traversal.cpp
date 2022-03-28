@@ -291,6 +291,8 @@ void Traversal::pass3_cb(ASTNode* node) {
             std::cerr << "Semantic error: number/type of arguments of function call does not match function declaration at or near line " << node->lineno << std::endl;
             exit(1);
         }
+
+        
     }
 
     // Cases to handle:
