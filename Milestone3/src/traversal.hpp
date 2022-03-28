@@ -19,6 +19,7 @@ class Traversal {
         // void prepostorder(ASTNode*, void(*)(ASTNode*), void(*)(ASTNode*));
 
         static int mainDecl_count;
+        static std::string mainDecl_name;
         //static std::unordered_map<std::string, std::string> scope_entry;
         //static std::unordered_map<std::string, std::shared_ptr<SymTabEntry>> scope;
         //static std::stack<std::unordered_map<std::string, std::shared_ptr<std::unordered_map<std::string, std::string>>>> scope_stack;

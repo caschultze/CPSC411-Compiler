@@ -9,6 +9,7 @@ Traversal::Traversal (ASTNode* _root) {
 
 // Initialize static variables.
 int Traversal::mainDecl_count;
+std::string Traversal::mainDecl_name;
 std::vector<std::string> Traversal::synthesized_sig;
 
 std::stack<SymTab> Traversal::scope_stack;
@@ -130,8 +131,6 @@ void Traversal::pass1_cb(ASTNode* node) {
         }
     }
     else if (node->type == "mainDecl") {
-        Traversal::mainDecl_count++;
-
         ASTNode* _id_child;
         std::string _return_type;
         std::string _sig;
@@ -164,6 +163,9 @@ void Traversal::pass1_cb(ASTNode* node) {
             _id_child->symtab_entry = scope_stack.top()[_id_child->attr];
             _id_child->sig = _id_child->symtab_entry->sig;
         }
+
+        Traversal::mainDecl_count++;
+        Traversal::mainDecl_name = _id_child->attr;
     }
     else if (node->type == "globVarDecl") {
         ASTNode* _id_child;
@@ -273,6 +275,12 @@ void Traversal::pass3_cb(ASTNode* node) {
     if (node->type == "funcCall") {
         ASTNode* _id = node->children[0];
         ASTNode* _actuals = node->children[1];
+
+        // check if funcCall is main function
+        if (_id->attr == mainDecl_name) {
+            std::cerr << "Semantic error: cannot call the main function at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
 
         // assign sig to funcCall node
         node->sig = _id->symtab_entry->return_type;
