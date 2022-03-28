@@ -269,9 +269,32 @@ void Traversal::pass2b_cb(ASTNode* node) {
 
 void Traversal::pass3_cb(ASTNode* node) {
 
+    // funcCall arguments
+    if (node->type == "funcCall") {
+        ASTNode* _id = node->children[0];
+        ASTNode* _actuals = node->children[1];
+
+        // assign sig to funcCall node
+        node->sig = _id->symtab_entry->return_type;
+
+        // check if num/type of arguments matches the ones associated with the identfier
+        std::string _actuals_sig = "f(";
+        bool _first = true;
+        for (size_t i = 0; i < _actuals->children.size(); i++ ) {
+            if (!_first) _actuals_sig.append(",");
+            _actuals_sig.append(_actuals->children[i]->sig);
+            _first = false;
+        }
+        _actuals_sig.append(")");
+
+        if (_actuals_sig != _id->symtab_entry->sig) {
+            std::cerr << "Semantic error: number/type of arguments of function call does not match function declaration at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
+    }
+
     // Cases to handle:
     // ||, &&, ==, !=, =, <, >, <=, >=, +, *, /, %, !, -
-
     // Binary boolean comparison cases
     if (node->type == "||" || node->type == "&&") {
 
