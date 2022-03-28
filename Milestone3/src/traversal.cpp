@@ -292,9 +292,17 @@ void Traversal::pass3_cb(ASTNode* node) {
             exit(1);
         }
 
-        
+
     }
 
+    // if/while
+    if (node->type == "if" || node->type == "ifElse" || node->type == "while") {
+        if (node->children[0]->sig != "boolean") {
+            std::cerr << "Semantic error: if- or while- statement needs a boolean expression at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
+    }
+    
     // Cases to handle:
     // ||, &&, ==, !=, =, <, >, <=, >=, +, *, /, %, !, -
     // Binary boolean comparison cases

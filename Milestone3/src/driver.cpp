@@ -18,11 +18,11 @@ bool Driver::start(istream &in)
         return 1;
     }
     bool res = parse(in);
+
     //tree->print();
 
     if (!res) res = semanticCheck();
-    std::cout << "Annotated tree: " << std::endl;
-    tree->print();
+    if (!res) tree->print();
     
     //if (!res) annotated_tree->print();
 
@@ -43,7 +43,6 @@ bool Driver::parse(istream &in)
 
     if (parser->parse() != 0)
     {
-        cerr << "Parse failed!!" << endl;
         return 1;
     }
 
