@@ -1,0 +1,11 @@
+main() {
+
+    // valid
+    while (true) {
+        break;
+    }
+
+    // invalid
+    // break;
+
+}

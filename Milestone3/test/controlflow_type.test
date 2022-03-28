@@ -1,7 +1,7 @@
 main() {
 
     // Valid
-    //if (true) {}
+    if (true) {}
     //if (false || true) {}
     //while (true) {}
     //while (false && true) {}
@@ -12,6 +12,6 @@ main() {
     //while () {}
     //if (0) {}
     //if ("hello") {}
-    if (0) {} else {}
+    //if (0) {} else {}
 
 }
