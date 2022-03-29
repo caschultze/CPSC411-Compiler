@@ -21,6 +21,7 @@ class Traversal {
         static int mainDecl_count;
         static std::string mainDecl_name;
         static int while_count;
+        static int block_count;
         static std::string funcDecl_return_type;
         static bool nonvoid_funcDecl_returns;
         //static std::unordered_map<std::string, std::string> scope_entry;

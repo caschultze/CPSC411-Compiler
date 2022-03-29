@@ -11,6 +11,7 @@ Traversal::Traversal (ASTNode* _root) {
 int Traversal::mainDecl_count;
 std::string Traversal::mainDecl_name;
 int Traversal::while_count;
+int Traversal::block_count;
 std::string Traversal::funcDecl_return_type;
 bool Traversal::nonvoid_funcDecl_returns;
 
@@ -421,7 +422,10 @@ void Traversal::pass4a_cb(ASTNode* node) {
     if (node->type == "while") {
         Traversal::while_count++;
     }
-    else if (node->type == "mainDecl" || node->type == "funcDecl") {
+    if (node->type == "block") {
+        Traversal::block_count++;
+    }
+    if (node->type == "mainDecl" || node->type == "funcDecl") {
         // If these are found, track the return value type
         Traversal::funcDecl_return_type = node->children[1]->symtab_entry->return_type;
 
@@ -440,6 +444,15 @@ void Traversal::pass4b_cb(ASTNode* node) {
     }
     else if (node->type == "while") {
         Traversal::while_count--;
+    }
+    else if (node->type == "varDecl") {
+        if (Traversal::block_count != 1) {
+            std::cerr << "Semantic error: local declaration not in outermost block at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
+    }
+    else if (node->type == "block") {
+        Traversal::block_count--;
     }
     else if (node->type == "return") {
         if (Traversal::funcDecl_return_type == "void") {

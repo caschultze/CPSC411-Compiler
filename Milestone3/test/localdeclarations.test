@@ -1,6 +1,16 @@
+void foo() {
+    int a;
+    if (true) {
+        while (true) {
+            int b;
+        }
+    }
+    // int b;
+}
+
 main() {
     int a;
     if (true) {
-        int b;
+        //int b;
     }
 }
