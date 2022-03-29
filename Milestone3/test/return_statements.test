@@ -1,0 +1,27 @@
+// Valid. No return inside void function.
+//void void1() { }
+
+// Valid. No value returned from a void function.
+//void void2() { return; }
+
+// Invalid. Value returned from a void function.
+//void void3() { return 0; }
+
+
+// Invalid. nonvoid function has no return statement.
+//int nonvoid1(){ }
+
+// Invalid. nonvoid function returns no value.
+//int nonvoid2() { return; }
+
+// Valid. Value returned from function has correct type.
+//int nonvoid3() { return 0; }
+
+// Invalid. Value returned from function has wrong type.
+//int nonvoid4() { return true; }
+
+
+
+main() {
+    return;
+}
