@@ -14,9 +14,7 @@ int Traversal::while_count;
 int Traversal::block_count;
 std::string Traversal::funcDecl_return_type;
 bool Traversal::nonvoid_funcDecl_returns;
-
 std::vector<std::string> Traversal::synthesized_sig;
-
 std::stack<SymTab> Traversal::scope_stack;
 
 
@@ -72,28 +70,6 @@ std::shared_ptr<SymTabEntry> Traversal::getSymTabEntryFromStack(std::string name
 
 
 void Traversal::traverse() {
-    // // Print predefined signatures on top of scope stack.
-    // while (!Traversal::scope_stack.empty()) {
-    //     for (auto const &pair: Traversal::scope_stack.top()) {
-    //         std::cout << "{" << pair.first << ": " << pair.second->at("sig") << "}\n";
-    //     }
-    //     Traversal::scope_stack.pop();
-    // }
-
-    // // Check if a name exists on top of scope stack.
-    // if (Traversal::nameDoesNotExistInTopOfScopeStack("prints")) {
-    //     std::cout << "found prints" << std::endl;
-    // } else {
-    //     std::cout << "failed to find prints" << std:: endl;
-    // }
-    
-    // // Check if a name exists in scope stack.
-    // if (Traversal::existsInScopeStack("prints2")) {
-    //     std::cout << "found prints" << std::endl;
-    // } else {
-    //     std::cout << "failed to find prints" << std:: endl;
-    // }
-
     pushPreDefinedNames();
     firstTraversal();
     secondTraversal();
