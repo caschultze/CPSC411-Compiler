@@ -1,0 +1,17 @@
+// Purpose:
+// Check if program processes "funcCall" correctly
+//
+// Expected result:
+// fail - args of funcCall do not match funcDecl
+
+void foo(int a, boolean b) { }
+
+
+main() {
+
+    int a;
+
+    // Incorrect type arguments
+    foo(a, a);
+
+}

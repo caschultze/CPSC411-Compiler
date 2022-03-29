@@ -1,0 +1,9 @@
+// Purpose:
+// Check if void functions do not have to return any value.
+//
+// Expected result:
+// failure - value returned from void function
+
+void foo() { return 0; }
+
+main() {}

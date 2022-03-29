@@ -1,0 +1,9 @@
+// Purpose:
+// Check if program processes "formals" correctly
+//
+// Expected result:
+// success - function signature of "foo" should include the types of its formals
+
+void foo(int bar) {}
+
+main() {}

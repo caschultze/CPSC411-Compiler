@@ -1,5 +1,0 @@
-int i;
-
-int foo() { return 0; }
-
-main() {}

@@ -1,0 +1,13 @@
+// Purpose:
+// Check if program allows recursive functions.
+//
+// Expected result:
+// success
+
+int recursive1() {
+    return recursive1();
+}
+
+main() {
+    recursive1();
+}

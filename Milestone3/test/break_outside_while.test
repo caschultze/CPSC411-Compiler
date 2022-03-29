@@ -2,13 +2,11 @@
 // Check if program processes "break" correctly
 //
 // Expected result:
-// success
+// failure - break outside of while-loop
 
 main() {
 
-    // valid
-    while (true) {
-        break;
-    }
+    // invalid
+    break;
 
 }

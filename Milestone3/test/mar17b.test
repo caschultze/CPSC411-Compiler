@@ -1,5 +1,11 @@
 // This test file is based on code shown during lecture on March 17
-// Purpose: test scope of identifiers
+//
+// Purpose: 
+// Test scope of identifiers
+//
+// Expected result: 
+// success
+
 int x;
 foo() {
     printi(x);

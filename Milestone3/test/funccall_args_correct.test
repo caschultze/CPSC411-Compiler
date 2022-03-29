@@ -1,16 +1,18 @@
+// Purpose:
+// Check if program processes "funcCall" correctly
+//
+// Expected result:
+// success
+
 void foo(int a, boolean b) { }
 
 
 main() {
+
     int a;
     boolean b;
     
     // Valid arguments
     foo(a, b);
 
-    // Incorrect type arguments
-    //foo(a, a);
-
-    // Incorrect number of arguments
-    //foo(a);
 }

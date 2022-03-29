@@ -1,3 +1,9 @@
+// Purpose:
+// Check if predefined names are accessible in program
+//
+// Expected result:
+// success
+
 main() {
     getchar();
     halt();

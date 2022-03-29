@@ -1,0 +1,21 @@
+// Purpose:
+// Check if globVarDecl, funcDecl, and mainDecl generate in global scope
+//
+// Expected result:
+// success
+
+int i;
+
+void foo(int arg1) { 
+    boolean a;
+    boolean b;
+    boolean c;
+    c = a || b;
+}
+
+main() {
+    boolean i;
+    int j;
+
+    foo(j);
+}

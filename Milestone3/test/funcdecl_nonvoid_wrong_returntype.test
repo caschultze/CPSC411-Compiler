@@ -1,0 +1,9 @@
+// Purpose:
+// Check if void functions do not have to return any value.
+//
+// Expected result:
+// failure - value returned from function has wrong type.
+
+int foo() { return true; }
+
+main() {}

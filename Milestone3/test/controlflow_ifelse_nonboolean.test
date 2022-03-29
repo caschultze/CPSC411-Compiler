@@ -1,0 +1,12 @@
+// Purpose:
+// Check if program processes "if-else" correctly
+//
+// Expected result:
+// failure - expected boolean inside if-else-condition
+
+main() {
+
+    // Invalid
+    if (true) {} else {}
+
+}

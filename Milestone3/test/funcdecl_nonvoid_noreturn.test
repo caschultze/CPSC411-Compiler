@@ -1,0 +1,9 @@
+// Purpose:
+// Check if nonvoid functions have to return.
+//
+// Expected result:
+// failure - nonvoid function has no return statement
+
+int foo() {}
+
+main() {}

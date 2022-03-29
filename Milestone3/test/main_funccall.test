@@ -1,0 +1,11 @@
+// Purpose:
+// Check if program processes funcCall of mainDecl correctly
+//
+// Expected result:
+// failure - the main function cannot be called
+
+void foo() {
+    main();
+}
+
+main() { }

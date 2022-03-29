@@ -1,0 +1,12 @@
+// Purpose:
+// Check if program processes type contained in "if" correctly
+//
+// Expected result:
+// success
+
+main() {
+
+    // Valid
+    if (true || false) {}
+
+}

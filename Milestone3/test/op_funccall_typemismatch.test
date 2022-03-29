@@ -1,0 +1,16 @@
+// Purpose:
+// Check if program processes "=" correctly
+//
+// Expected result:
+// failure - bad types for "=" operator
+
+void foo() { }
+
+main() {
+
+    int a;
+
+    // Invalid assignments
+    a = foo();
+    
+}

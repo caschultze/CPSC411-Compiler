@@ -1,0 +1,8 @@
+// Purpose:
+// Check if program enables the ability to redefine predefined ids in a new scope.
+//
+// Expected result:
+// success
+
+void printb(int i) { }
+main() {}

@@ -1,5 +1,12 @@
 // This test file is based on code shown during lecture on March 8
-// Purpose: check for occurence of two semantic errors
+//
+// Purpose:
+// Check for occurrence of two semantic errors
+//
+// Expected result:
+// failure - break outside of while-statement OR no return statement in nonvoid function
+
+
 int foo(boolean b, int i) {
     int j;
     break;

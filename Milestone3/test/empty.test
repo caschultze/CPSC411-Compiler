@@ -1,0 +1,5 @@
+// Purpose:
+// Check if program processes "empty program" correctly
+//
+// Expected result:
+// failure - no main declaration

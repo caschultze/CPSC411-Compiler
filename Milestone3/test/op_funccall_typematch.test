@@ -1,0 +1,19 @@
+// Purpose:
+// Check if program processes "=" correctly
+//
+// Expected result:
+// success
+
+int foo() { return 0; }
+boolean bar() { return true; }
+
+main() {
+
+    int a;
+    boolean b;
+
+    // Valid assignments
+    a = foo();
+    b = bar();
+    
+}
