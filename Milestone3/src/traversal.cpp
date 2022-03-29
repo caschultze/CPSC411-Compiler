@@ -73,8 +73,8 @@ void Traversal::traverse() {
     pushPreDefinedNames();
     firstTraversal();
     secondTraversal();
-    thirdTraversal();
-    fourthTraversal();
+    //thirdTraversal();
+    //fourthTraversal();
 }
 
 void Traversal::firstTraversal() {
@@ -109,6 +109,8 @@ void Traversal::pass1_cb(ASTNode* node) {
         node->sig = "int";
     } else if (node->type == "true" || node->type == "false") {
         node->sig = "boolean";
+    } else if (node->type == "string") {
+        node->sig = "string";
     }
     else if (node->type == "formal") {
         for (size_t i = 0; i < node->children.size(); i++) {
@@ -284,6 +286,9 @@ void Traversal::pass3_cb(ASTNode* node) {
 
         if (_actuals_sig != _id->symtab_entry->sig) {
             std::cerr << "Semantic error: number/type of arguments of function call does not match function declaration at or near line " << node->lineno << std::endl;
+            std::cerr << "_id->symtab_entry->sig: " << _id->symtab_entry->sig << std::endl;
+            std::cerr << "_actuals_sig: " << _actuals_sig << std::endl;
+
             exit(1);
         }
 
