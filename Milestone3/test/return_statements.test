@@ -1,8 +1,8 @@
 // Valid. No return inside void function.
-//void void1() { }
+void void1() { }
 
 // Valid. No value returned from a void function.
-//void void2() { return; }
+void void2() { return; }
 
 // Invalid. Value returned from a void function.
 //void void3() { return 0; }
@@ -15,13 +15,21 @@
 //int nonvoid2() { return; }
 
 // Valid. Value returned from function has correct type.
-//int nonvoid3() { return 0; }
+int nonvoid3() { return 0; }
 
 // Invalid. Value returned from function has wrong type.
 //int nonvoid4() { return true; }
 
 
+// Valid. 
+int recursive1() { return recursive1(); }
+
+// Invalid
+//int foo() { return halt(); }
 
 main() {
+    // This is valid.
     return;
+    // This is invalid.
+    // return 0;
 }

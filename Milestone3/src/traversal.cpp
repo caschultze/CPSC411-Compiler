@@ -11,6 +11,9 @@ Traversal::Traversal (ASTNode* _root) {
 int Traversal::mainDecl_count;
 std::string Traversal::mainDecl_name;
 int Traversal::while_count;
+std::string Traversal::funcDecl_return_type;
+bool Traversal::nonvoid_funcDecl_returns;
+
 std::vector<std::string> Traversal::synthesized_sig;
 
 std::stack<SymTab> Traversal::scope_stack;
@@ -418,6 +421,14 @@ void Traversal::pass4a_cb(ASTNode* node) {
     if (node->type == "while") {
         Traversal::while_count++;
     }
+    else if (node->type == "mainDecl" || node->type == "funcDecl") {
+        // If these are found, track the return value type
+        Traversal::funcDecl_return_type = node->children[1]->symtab_entry->return_type;
+
+        if (Traversal::funcDecl_return_type == "int" || Traversal::funcDecl_return_type == "boolean") {
+            Traversal::nonvoid_funcDecl_returns = false;
+        }
+    }
 }
 
 void Traversal::pass4b_cb(ASTNode* node) {
@@ -427,8 +438,46 @@ void Traversal::pass4b_cb(ASTNode* node) {
             exit(1);
         }
     }
-    if (node->type == "while") {
+    else if (node->type == "while") {
         Traversal::while_count--;
+    }
+    else if (node->type == "return") {
+        if (Traversal::funcDecl_return_type == "void") {
+            if (node->children.size() > 0) {
+                std::cerr << "Semantic error: void function cannot return a value at or near line " << node->lineno << std::endl;
+                exit(1);
+            }
+        }
+        else if (Traversal::funcDecl_return_type == "int" || Traversal::funcDecl_return_type == "boolean") {
+            Traversal::nonvoid_funcDecl_returns = true;
+            if (node->children.size() == 0) {
+                std::cerr << "Semantic error: non-void function must return a value at or near line " << node->lineno << std::endl;
+                exit(1);
+            }
+            if (node->children.size() > 0) {
+                if (Traversal::funcDecl_return_type != node->children[0]->sig) {
+                    std::cerr << "Semantic error: returned value of function has the wrong type at or near line " << node->lineno << std::endl;
+                    exit(1);
+                }
+            }
+        }
+        else {
+            // Should never happen.
+            std::cerr << "Unexpected semantic error: function return type is not int, boolean or void at or near line " << node->lineno << std::endl;
+            exit(1);
+        }
+    }
+    else if (node->type == "mainDecl" || node->type == "funcDecl") {
+
+        if (Traversal::funcDecl_return_type == "int" || Traversal::funcDecl_return_type == "boolean") {
+            if (Traversal::nonvoid_funcDecl_returns == false) {
+                std::cerr << "Semantic error: no return statement in non-void function '" << node->children[1]->attr << "'" << std::endl;
+                exit(1);
+            }
+        }
+
+        Traversal::funcDecl_return_type = "";
+        Traversal::nonvoid_funcDecl_returns = false;
     }
 }
 
