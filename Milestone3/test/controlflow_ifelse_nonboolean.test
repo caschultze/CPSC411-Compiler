@@ -7,6 +7,6 @@
 main() {
 
     // Invalid
-    if (true) {} else {}
+    if (0) {} else {}
 
 }
