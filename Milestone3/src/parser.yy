@@ -294,7 +294,7 @@ postfixexpression           : primary                                           
                             ;
 
 unaryexpression             : "-" unaryexpression                                   { 
-                                                                                        if ( $2->GetType() == "number" ) {
+                                                                                        if ( $2->GetType() == "number" && !($2->attr.find('-') != std::string::npos)) {
                                                                                             std::string neg = "-";
                                                                                             neg.append($2->attr);
                                                                                             $2->SetAttr(neg);

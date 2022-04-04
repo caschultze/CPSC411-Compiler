@@ -73,8 +73,8 @@ void Traversal::traverse() {
     pushPreDefinedNames();
     firstTraversal();
     secondTraversal();
-    //thirdTraversal();
-    //fourthTraversal();
+    thirdTraversal();
+    fourthTraversal();
 }
 
 void Traversal::firstTraversal() {

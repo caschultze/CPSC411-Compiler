@@ -1,0 +1,14 @@
+// Purpose:
+// Check if double minus is handled correctly by syntax tree.
+//
+// Expected result:
+// success
+
+main() {
+    int i;
+    i = -2;
+    i = --2;
+
+    boolean b;
+    b = !true;
+}
