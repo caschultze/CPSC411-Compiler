@@ -1,0 +1,10 @@
+//int i;
+
+main() {
+    foo(12);
+    bar(true);
+}
+
+void foo(int i) {}
+
+void bar(boolean b) {}
