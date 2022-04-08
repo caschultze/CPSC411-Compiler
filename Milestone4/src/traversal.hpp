@@ -50,18 +50,30 @@ class Traversal {
 
         // For code generation
         static int global_labelno;
-        static int labelno;
+        static int func_labelno;
+        static int string_labelno;
+        static int control_labelno;
+        static std::stack<std::string> while_labels;
         static int stack_frame_size;
+        static std::string return_label;
         static std::string gen_line;
         static std::vector<std::string> gen_lines;
 
         static reg_allocator registers;
         static void genPreOrder(ASTNode*, bool(*)(ASTNode*));
-        static bool genGlobVarDecl_cb(ASTNode*);
-        static bool gen2_cb(ASTNode*);
+
+
+        static bool defineGlobVarDeclLabels_cb(ASTNode*);
+        static bool defineFuncDeclLabels_cb(ASTNode*);
+
         static bool getStackFrameSize_cb(ASTNode*);
-        static bool freeRegisters_cb(ASTNode*);
-        static bool genBlock_cb(ASTNode*);
-        // static bool genLoad_cb(ASTNode*);
+        static bool gen_cb(ASTNode*);
+
+        static bool genStatement_cb(ASTNode*);
+
+        static void genRuntimeLibrary();
+
+        
+
 
 };
