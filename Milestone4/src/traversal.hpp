@@ -73,6 +73,8 @@ class Traversal {
 
         static void genRuntimeLibrary();
 
+        static std::string genExpr(ASTNode*);
+
         
 
 

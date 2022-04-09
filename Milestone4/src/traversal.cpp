@@ -747,6 +747,175 @@ bool Traversal::gen_cb(ASTNode* node) {
     return false;
 }
 
+std::string Traversal::genExpr(ASTNode* node) {
+    if (node->type == "number") {
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        li $" + r + ", " + node->attr);
+        return r;
+    }
+    if (node->type == "false") {
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        li $" + r + ", 0");
+        return r;
+    }
+    if (node->type == "true") {
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        li $" + r + ", 1");
+        return r;
+    }
+    if (node->type == "string") {
+        gen_lines.push_back("        .data");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: ");
+        gen_lines.push_back("        .word " + std::to_string(node->attr.size() + 1));
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": ");
+        std::string byte_array = "        .byte ";
+        int c;
+        bool escape = false;
+        for (size_t z = 0; z < node->attr.size(); z++) {
+            c = (int)node->attr[z];
+            if (escape == true) {
+                switch (c) {
+                    case 98:    // '\b'
+                        byte_array.append("8 , ");
+                        break;
+                    case 116:    // '\t'
+                        byte_array.append("9 , ");
+                        break;
+                    case 110:    // '\n'
+                        byte_array.append("10 , ");
+                        break;
+                    case 102:    // '\f'
+                        byte_array.append("12 , ");
+                        break;
+                    case 114:    // '\r'
+                        byte_array.append("13 , ");
+                        break;
+                    case 39:    // '\''
+                        byte_array.append("39 , ");
+                        break;
+                    case 34:    // '\"'
+                        byte_array.append("34 , ");
+                        break;
+                    case 92:    // '\\'
+                        byte_array.append("92 , ");
+                        break;
+                    default:
+                        std::cerr << "error: unsupported escape character" << std::endl;
+                        exit(1);
+                    }
+                    escape = false;
+                    continue;
+                }
+            if (c == 92) { 
+                escape = true;
+                continue;
+            }
+            byte_array.append(std::to_string(c) + " , ");
+        }
+        byte_array.append("0");
+        gen_lines.push_back(byte_array);
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("        .text");
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        la $" + r + ", LS" + std::to_string(Traversal::string_labelno));
+        return r;
+    }
+    if (node->type == "!") {
+        std::string r = genExpr(node->children[0]);
+        gen_lines.push_back("        xori $" + r + ", $" + r + ", 1");
+        return r;
+    }
+    if (node->type == "==") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        seq $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "!=") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        sne $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "<") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        slt $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == ">") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        sgt $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "<=") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        sle $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == ">=") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        sge $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "+") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        addu $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "-") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        subu $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "*") {
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        mul $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "/") {
+        //todo
+    }
+    if (node->type == "%") {
+        //todo
+    }
+    return "Uncaught expression";
+}
+
 
 bool Traversal::genStatement_cb(ASTNode* node) {
 
@@ -756,7 +925,6 @@ bool Traversal::genStatement_cb(ASTNode* node) {
     }
     if (node->type == "block") {
         // Execute callback on each child statement.
-        std::cout << "hello block" << std::endl;
         for (size_t i = 0; i < node->children.size(); i++) {
             genPreOrder(node->children[i], genStatement_cb);
         }
@@ -774,7 +942,6 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         return true;
     }
     if (node->type == "while") {
-        std::cout << "hello while" << std::endl;
         // Children are expression and 'block'
         gen_lines.push_back("# begin while statement");
         std::string label1 = "L" + std::to_string(control_labelno++);
@@ -783,7 +950,10 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         Traversal::while_labels.push(label2);
         gen_lines.push_back(label1 + ":");          // Loop top
         // todo: gen expression code here. results in 'result register' being populated
-        gen_lines.push_back("        beqz $<RESULT_REGISTER>, " + label2);
+        std::string result_register = genExpr(node->children[0]);
+        gen_lines.push_back("        beqz $" + result_register + ", " + label2);
+        registers.freereg(result_register);
+
         genStatement_cb(node->children[1]);         // Loop body
         gen_lines.push_back("        j "+ label1);
         gen_lines.push_back(label2 + ":");          // Loop exit
@@ -794,7 +964,6 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         return true;
     }
     if (node->type == "break") {
-        std::cout << "hello break" << std::endl;
         // Only occurs within a while-block
         gen_lines.push_back("# begin break statement");
         gen_lines.push_back("        j " + while_labels.top());
@@ -803,12 +972,12 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         return true;
     }
     if (node->type == "return") {
-        std::cout << "hello return" << std::endl;
         // If it has a child expression, load its register into $v0. Jump to function epilogue.
         gen_lines.push_back("# begin return statement");
         if (node->children.size() > 0) {
-            // todo: gen expression code here. results in 'result register' being populated
-            gen_lines.push_back("        move $v0, $<RESULT_REGISTER>");
+            std::string result_register = genExpr(node->children[0]);
+            gen_lines.push_back("        move $v0, $" + result_register);
+            registers.freereg(result_register);
         }
         gen_lines.push_back("        j " + Traversal::return_label);
         gen_lines.push_back("# end return statement");
@@ -816,20 +985,17 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         return true;
     }
     if (node->type == "if") {
-        std::cout << "hello if" << std::endl;
         // Children are expression and 'block'
         gen_lines.push_back("# begin if statement");
-
-        // todo: gen expression code here. results in 'result register' being populated
-
+        std::string result_register = genExpr(node->children[0]);
         // Gen code for branch.
         std::string label = "L" + std::to_string(control_labelno++);
         if (node->children[0]->type == "||" || node->children[0]->type == "&&") {
             // todo: case for short-circuit logic
         }
         else {
-            // expression is 'funcCall', 'true', or 'false'
-            gen_lines.push_back("        beqz $<RESULT_REGISTER>, " + label);
+            gen_lines.push_back("        beqz $" + result_register + ", " + label);
+            registers.freereg(result_register);
         }
 
         // Gen code for 'block'
@@ -845,8 +1011,7 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         std::cout << "hello ifElse" << std::endl;
         // Children are expression, 'block', and 'block'
         gen_lines.push_back("# begin ifElse statement");
-        // todo: gen expression code here. results in 'result register' being populated
-
+        std::string result_register = genExpr(node->children[0]);
         // Gen code for branch.
         std::string label1 = "L" + std::to_string(control_labelno++);
         std::string label2 = "L" + std::to_string(control_labelno++);
@@ -855,9 +1020,9 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         }
         else {
             // expression is 'funcCall', 'true', or 'false'
-            gen_lines.push_back("        beqz $<RESULT_REGISTER>, " + label1);
+            gen_lines.push_back("        beqz $" + result_register + ", " + label1);
+            registers.freereg(result_register);
         }
-
         // Gen code for if-block
         genStatement_cb(node->children[1]);
         gen_lines.push_back("        j " + label2);
