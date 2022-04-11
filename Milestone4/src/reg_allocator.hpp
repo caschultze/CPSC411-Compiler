@@ -16,4 +16,6 @@ class reg_allocator {
         
         std::string allocreg();
         void freereg(std::string);
+
+        std::vector<std::string> used();
 };

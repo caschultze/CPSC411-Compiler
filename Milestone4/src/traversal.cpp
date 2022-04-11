@@ -537,7 +537,32 @@ void Traversal::genRuntimeLibrary() {
     // gen_lines.push_back("");
     // gen_lines.push_back("# int getchar() ");
     // gen_lines.push_back("LGetchar:");
+    gen_lines.push_back("");
+    gen_lines.push_back("# error");
+    gen_lines.push_back("error: ");
+    gen_lines.push_back("        jal LPrints");
+    gen_lines.push_back("        li $v0, 10");
+    gen_lines.push_back("        syscall");
 
+    gen_lines.push_back("");
+    gen_lines.push_back("# int getchar()");
+    gen_lines.push_back("LGetchar:");
+    gen_lines.push_back("                        .data");
+    gen_lines.push_back("                SGetchar:");
+    gen_lines.push_back("                        .space 2");
+    gen_lines.push_back("         .text");
+    gen_lines.push_back("         li $v0, 8");
+    gen_lines.push_back("         la $a0, SGetchar");
+    gen_lines.push_back("         li $a1, 2 # maybe this should be 2?");
+    gen_lines.push_back("         syscall   # get string");
+    gen_lines.push_back("         la $s8, SGetchar");
+    gen_lines.push_back("         lb $s8, ($s8)");
+    gen_lines.push_back("         beqz $s8, LGetcharEOF");
+    gen_lines.push_back("         move $v0, $s8");
+    gen_lines.push_back("         jr $ra");
+    gen_lines.push_back("LGetcharEOF:");
+    gen_lines.push_back("         li $v0, -1");
+    gen_lines.push_back("         jr $ra");
 
     gen_lines.push_back("");
     gen_lines.push_back("# void halt() ");
@@ -729,7 +754,27 @@ bool Traversal::gen_cb(ASTNode* node) {
         genPreOrder(node->children[3], genStatement_cb);
         Traversal::return_label = "";
 
-        // TODO: free all registers used by this function, after function body finishes
+        // Error if nonvoid function fails to return
+        if (node->children[1]->symtab_entry->return_type == "int" || node->children[1]->symtab_entry->return_type == "boolean") {
+            gen_lines.push_back("        .data");
+            gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: ");             // string length label
+            gen_lines.push_back("        .word " + std::to_string(node->children[1]->attr.size() + 48)); // len(error message) + len(function name)
+            gen_lines.push_back("        .align 2");
+
+            gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": "); // string label
+            std::string byte_array = "        .byte ";
+            byte_array.append("114 , 117 , 110 , 116 , 105 , 109 , 101 , 32 , 101 , 114 , 114 , 111 , 114 , 58 , 32 , 102 , 117 , 110 , 99 , 116 , 105 , 111 , 110 , 32 , 34 , ");
+            for (size_t z = 0; z < node->children[1]->attr.size(); z++) {
+                byte_array.append(std::to_string((int)node->children[1]->attr[z]) + " , ");
+            }
+            byte_array.append("34 , 32 , 109 , 117 , 115 , 116 , 32 , 114 , 101 , 116 , 117 , 114 , 110 , 32 , 97 , 32 , 118 , 97 , 108 , 117 , 101 , 10 , 0");
+            gen_lines.push_back(byte_array);
+            gen_lines.push_back("        .align 2");
+            gen_lines.push_back("        .text");
+            gen_lines.push_back("        la $a0, LS" + std::to_string(Traversal::string_labelno));
+            gen_lines.push_back("        lw $s8, LS" + std::to_string(Traversal::string_labelno++) + "Len");
+            gen_lines.push_back("        j error");
+        }
 
         // Function Footer Label
         gen_lines.push_back(node->children[1]->symtab_entry->epilogue_label + ":");
@@ -748,6 +793,26 @@ bool Traversal::gen_cb(ASTNode* node) {
 }
 
 std::string Traversal::genExpr(ASTNode* node) {
+    if (node->type == "id") {
+        std::string r = registers.allocreg();
+        if (node->symtab_entry->global_label != "") {
+            gen_lines.push_back("        lw $" + r + ", " + node->symtab_entry->global_label);
+        } 
+        else if (node->symtab_entry->stack_address > 0) {
+            gen_lines.push_back("        lw $" + r + ", " + std::to_string(node->symtab_entry->stack_address) + "($sp)");
+        } 
+        return r;
+    }
+    if (node->type == "=") {
+        std::string r = genExpr(node->children[1]);
+        if (node->children[0]->symtab_entry->global_label != "") {
+            gen_lines.push_back("        sw $" + r + ", " + node->children[0]->symtab_entry->global_label);
+        }
+        else if (node->children[0]->symtab_entry->stack_address > 0) {
+            gen_lines.push_back("        sw $" + r + ", " + std::to_string(node->children[0]->symtab_entry->stack_address) + "($sp)");
+        }
+        return r;
+    }
     if (node->type == "number") {
         std::string r = registers.allocreg();
         gen_lines.push_back("        li $" + r + ", " + node->attr);
@@ -766,14 +831,13 @@ std::string Traversal::genExpr(ASTNode* node) {
     if (node->type == "string") {
         gen_lines.push_back("        .data");
         gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: ");
-        gen_lines.push_back("        .word " + std::to_string(node->attr.size() + 1));
-        gen_lines.push_back("        .align 2");
-        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": ");
+        
+        
+        int byte_array_len = 0;
         std::string byte_array = "        .byte ";
-        int c;
         bool escape = false;
         for (size_t z = 0; z < node->attr.size(); z++) {
-            c = (int)node->attr[z];
+            int c = (int)node->attr[z];
             if (escape == true) {
                 switch (c) {
                     case 98:    // '\b'
@@ -804,6 +868,7 @@ std::string Traversal::genExpr(ASTNode* node) {
                         std::cerr << "error: unsupported escape character" << std::endl;
                         exit(1);
                     }
+                    byte_array_len++;
                     escape = false;
                     continue;
                 }
@@ -812,14 +877,19 @@ std::string Traversal::genExpr(ASTNode* node) {
                 continue;
             }
             byte_array.append(std::to_string(c) + " , ");
+            byte_array_len++;
         }
+        gen_lines.push_back("        .word " + std::to_string(byte_array_len));
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": ");
         byte_array.append("0");
         gen_lines.push_back(byte_array);
         gen_lines.push_back("        .align 2");
         gen_lines.push_back("        .text");
-        std::string r = registers.allocreg();
-        gen_lines.push_back("        la $" + r + ", LS" + std::to_string(Traversal::string_labelno));
-        return r;
+        // std::string r = registers.allocreg();
+        gen_lines.push_back("        la $a0, LS" + std::to_string(Traversal::string_labelno));
+        gen_lines.push_back("        lw $s8, LS" + std::to_string(Traversal::string_labelno++) + "Len");
+        return "string";
     }
     if (node->type == "!") {
         std::string r = genExpr(node->children[0]);
@@ -885,18 +955,29 @@ std::string Traversal::genExpr(ASTNode* node) {
         std::string r2 = genExpr(node->children[1]);
         std::string r = registers.allocreg();
         gen_lines.push_back("        addu $" + r + ", $" + r1 + ", $" + r2);
-        registers.freereg(r1);
-        registers.freereg(r2);
+        registers.freereg(r1); // fib errors
+        registers.freereg(r2); // fib errors here because r1 is now in $t1
         return r;
     }
     if (node->type == "-") {
-        std::string r1 = genExpr(node->children[0]);
-        std::string r2 = genExpr(node->children[1]);
-        std::string r = registers.allocreg();
-        gen_lines.push_back("        subu $" + r + ", $" + r1 + ", $" + r2);
-        registers.freereg(r1);
-        registers.freereg(r2);
-        return r;
+        if (node->children.size() == 1) {
+            std::string r = genExpr(node->children[0]);
+            gen_lines.push_back("        negu $" + r + ", $" + r);
+            return r;
+        }
+        else if (node->children.size() == 2) {
+            std::string r1 = genExpr(node->children[0]);
+            std::string r2 = genExpr(node->children[1]);
+            std::string r = registers.allocreg();
+            gen_lines.push_back("        subu $" + r + ", $" + r1 + ", $" + r2);
+            registers.freereg(r1);
+            registers.freereg(r2);
+            return r;
+        }
+        else {
+            std::cerr << "Undefined error: '-' does not have 0 or 1 children nodes" << std::endl;
+            exit(1);
+        }
     }
     if (node->type == "*") {
         std::string r1 = genExpr(node->children[0]);
@@ -908,10 +989,118 @@ std::string Traversal::genExpr(ASTNode* node) {
         return r;
     }
     if (node->type == "/") {
-        //todo
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        bnez $" + r2 + ", L" + std::to_string(control_labelno));
+        gen_lines.push_back("        .data");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: "); // string length label
+        gen_lines.push_back("        .word 33");
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": "); // string label
+        gen_lines.push_back("        .byte 114 , 117 , 110 , 116 , 105 , 109 , 101 , 32 , 101 , 114 , 114 , 111 , 114 , 58 , 32 , 100 , 105 , 118 , 105 , 115 , 105 , 111 , 110 , 32 , 98 , 121 , 32 , 122 , 101 , 114 , 111 , 10 , 0 # runtime error: division by zero");
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("        .text");
+        gen_lines.push_back("        la $a0, LS" + std::to_string(Traversal::string_labelno));
+        gen_lines.push_back("        lw $s8, LS" + std::to_string(Traversal::string_labelno++) + "Len");
+        gen_lines.push_back("        j error");
+        gen_lines.push_back("L" + std::to_string(control_labelno++) + ":");
+        gen_lines.push_back("        div $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
     }
     if (node->type == "%") {
-        //todo
+        std::string r1 = genExpr(node->children[0]);
+        std::string r2 = genExpr(node->children[1]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        bnez $" + r2 + ", L" + std::to_string(control_labelno));
+        gen_lines.push_back("        .data");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: "); // string length label
+        gen_lines.push_back("        .word 31");
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": "); // string label
+        gen_lines.push_back("        .byte 114 , 117 , 110 , 116 , 105 , 109 , 101 , 32 , 101 , 114 , 114 , 111 , 114 , 58 , 32 , 109 , 111 , 100 , 117 , 108 , 111 , 32 , 98 , 121 , 32 , 122 , 101 , 114 , 111 , 10 , 0 # runtime error: modulo by zero");
+        gen_lines.push_back("        .align 2");
+        gen_lines.push_back("        .text");
+        gen_lines.push_back("        la $a0, LS" + std::to_string(Traversal::string_labelno));
+        gen_lines.push_back("        lw $s8, LS" + std::to_string(Traversal::string_labelno++) + "Len");
+        gen_lines.push_back("        j error");
+        gen_lines.push_back("L" + std::to_string(control_labelno++) + ":");
+        gen_lines.push_back("        rem $" + r + ", $" + r1 + ", $" + r2);
+        registers.freereg(r1);
+        registers.freereg(r2);
+        return r;
+    }
+    if (node->type == "funcCall") {
+
+        // 1. Copy args from non-call registers to call registers
+        std::vector<std::string> r_args;
+        for (size_t i = 0; i < node->children[1]->children.size(); i++) {
+            r_args.push_back(genExpr(node->children[1]->children[i]));
+        }
+        for (size_t i = 0; i < node->children[1]->children.size(); i++) {
+            //todo: handle funcCall that takes in global label as arg.
+            if (r_args[i] != "string") {
+                gen_lines.push_back("        move $a" + std::to_string(i) + ", $" + r_args[i]);
+            }
+            registers.freereg(r_args[i]);
+        }
+
+        // 2. Save any registers in use onto the stack (ascending order)
+        std::vector<std::string> r_used = registers.used();
+        for (size_t i = 0; i < r_used.size(); i++) {
+            gen_lines.push_back("        subu $sp, $sp, 4");
+            gen_lines.push_back("        sw $" + r_used[i] + ", 0($sp)");
+        }
+
+        // 3. Do funcCall
+        std::cout << "Do funcCall" << std::endl;
+        std::string r = "void";
+        if (node->children[0]->symtab_entry->prologue_label == "") {
+            if (node->children[0]->attr == "getchar") {
+                r = registers.allocreg();
+                gen_lines.push_back("        jal LGetchar");
+                gen_lines.push_back("");
+                gen_lines.push_back("        move $" + r + ", $v0");
+            } else if (node->children[0]->attr == "halt") {
+                gen_lines.push_back("        jal LHalt");
+                gen_lines.push_back("");
+            } else if (node->children[0]->attr == "printb") {
+                gen_lines.push_back("        jal LPrintb");
+                gen_lines.push_back("");
+            } else if (node->children[0]->attr == "printc") {
+                gen_lines.push_back("        jal LPrintc");
+                gen_lines.push_back("");
+            } else if (node->children[0]->attr == "printi") {
+                gen_lines.push_back("        jal LPrinti");
+                gen_lines.push_back("");
+            } else if (node->children[0]->attr == "prints") {
+                gen_lines.push_back("        jal LPrints");
+                gen_lines.push_back("");
+            }
+            // return r;
+        } else if (node->children[0]->symtab_entry->return_type == "int" || node->children[0]->symtab_entry->return_type == "boolean") {
+            r = registers.allocreg();
+            gen_lines.push_back("        jal " + node->children[0]->symtab_entry->prologue_label);
+            gen_lines.push_back("");
+            gen_lines.push_back("        move $" + r + ", $v0");
+        }
+        else {
+            gen_lines.push_back("        jal " + node->children[0]->symtab_entry->prologue_label);
+            gen_lines.push_back("");
+        }
+
+        // 4. restore saved registers
+        std::cout << "restore saved registers" << std::endl;
+        for (size_t i = 0; i < r_used.size(); i++) {
+            gen_lines.push_back("        lw $" + r_used[i] + ", 0($sp)");
+            gen_lines.push_back("        addu $sp, $sp, 4");
+        }
+        std::cout << "goodbye funcCall\n\n" << std::endl;
+        return r;
+
+        
     }
     return "Uncaught expression";
 }
@@ -936,9 +1125,9 @@ bool Traversal::genStatement_cb(ASTNode* node) {
     if (node->type == "stmtExpr") {
         std::cout << "hello stmtExpr" << std::endl;
         gen_lines.push_back("# begin stmtExpr");
-        // Child node is either 'funcCall' or '='
+        std::string result_register = genExpr(node->children[0]);
+        registers.freereg(result_register);
         gen_lines.push_back("# end stmtExpr");
-
         return true;
     }
     if (node->type == "while") {

@@ -44,6 +44,9 @@ std::string reg_allocator::allocreg() {
 };
 
 void reg_allocator::freereg(std::string r) {
+    if (r == "void" || r == "string") {
+        return;
+    }
     for (size_t i = 0; i < registers.size(); i++) {
         if (registers[i].first == r && registers[i].second == true) {
             std::cout << "freed register: " << registers[i].first << std::endl;
@@ -53,4 +56,14 @@ void reg_allocator::freereg(std::string r) {
     }
     std::cerr << "Error: register is already free or does not exist - '" << r << "'" << std::endl;
     exit(1);
+}
+
+std::vector<std::string> reg_allocator::used() {
+    std::vector<std::string> res;
+    for (size_t i = 0; i < registers.size(); i++) {
+        if (registers[i].second == true) {
+            res.push_back(registers[i].first);
+        }
+    }
+    return res;
 }
