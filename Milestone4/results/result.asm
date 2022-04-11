@@ -4,55 +4,197 @@
                      jal P0
                      li $v0, 10
                      syscall
+        .data
+G0:
+        .word 0
+        .text
+        .data
+G1:
+        .word 0
+        .text
+        .data
+G2:
+        .word 0
+        .text
+        .data
+G3:
+        .word 0
+        .text
+        .data
+G4:
+        .word 0
+        .text
+        .data
+G5:
+        .word 0
+        .text
+        .data
+G6:
+        .word 0
+        .text
+        .data
+G7:
+        .word 0
+        .text
+        .data
+G8:
+        .word 0
+        .text
+        .data
+G9:
+        .word 0
+        .text
+        .data
+G10:
+        .word 0
+        .text
+        .data
+G11:
+        .word 0
+        .text
+        .data
+G12:
+        .word 0
+        .text
+        .data
+G13:
+        .word 0
+        .text
+        .data
+G14:
+        .word 0
+        .text
+        .data
+G15:
+        .word 0
+        .text
+        .data
+G16:
+        .word 0
+        .text
+        .data
+G17:
+        .word 0
+        .text
+        .data
+G18:
+        .word 0
+        .text
+        .data
+G19:
+        .word 0
+        .text
+        .data
+G20:
+        .word 0
+        .text
+        .data
+G21:
+        .word 0
+        .text
 P0:
         subu $sp, $sp, 4
         sw $ra, 0($sp)
-# begin while statement
-L0:
-        beqz $<RESULT_REGISTER>, L1
-# begin break statement
-        j L1
-# end break statement
-        j L0
-L1:
-# end while statement
-# begin while statement
-L2:
-        beqz $<RESULT_REGISTER>, L3
-# begin while statement
-L4:
-        beqz $<RESULT_REGISTER>, L5
-# begin break statement
-        j L5
-# end break statement
-        j L4
-L5:
-# end while statement
-# begin break statement
-        j L3
-# end break statement
-        j L2
-L3:
-# end while statement
-# begin while statement
-L6:
-        beqz $<RESULT_REGISTER>, L7
-# begin break statement
-        j L7
-# end break statement
-# begin while statement
-L8:
-        beqz $<RESULT_REGISTER>, L9
-# begin break statement
-        j L9
-# end break statement
-        j L8
-L9:
-# end while statement
-        j L6
-L7:
-# end while statement
+# begin stmtExpr
+        jal P1
+
+# end stmtExpr
 E0:
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
+P1:
+        subu $sp, $sp, 4
+        sw $ra, 0($sp)
+# begin stmtExpr
+        li $t0, -1
+        sw $t0, G0
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 48
+        sw $t0, G10
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 57
+        sw $t0, G11
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 43
+        sw $t0, G12
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 45
+        sw $t0, G13
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 42
+        sw $t0, G14
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 47
+        sw $t0, G15
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 40
+        sw $t0, G16
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 41
+        sw $t0, G17
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 32
+        sw $t0, G18
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 9
+        sw $t0, G19
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 13
+        sw $t0, G20
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 10
+        sw $t0, G21
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 256
+        sw $t0, G1
+# end stmtExpr
+# begin stmtExpr
+        li $t0, 257
+        sw $t0, G3
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G12
+        sw $t0, G4
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G13
+        sw $t0, G5
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G14
+        sw $t0, G6
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G15
+        sw $t0, G7
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G16
+        sw $t0, G8
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G17
+        sw $t0, G9
+# end stmtExpr
+# begin stmtExpr
+        lw $t0, G21
+        sw $t0, G2
+# end stmtExpr
+E1:
         lw $ra, 0($sp)
         addu $sp, $sp, 4
         jr $ra
@@ -61,6 +203,31 @@ E0:
 
 
 ## --------------- Run-time library --------------- ##
+
+# error
+error: 
+        jal LPrints
+        li $v0, 10
+        syscall
+
+# int getchar()
+LGetchar:
+                        .data
+                SGetchar:
+                        .space 2
+         .text
+         li $v0, 8
+         la $a0, SGetchar
+         li $a1, 2 # maybe this should be 2?
+         syscall   # get string
+         la $s8, SGetchar
+         lb $s8, ($s8)
+         beqz $s8, LGetcharEOF
+         move $v0, $s8
+         jr $ra
+LGetcharEOF:
+         li $v0, -1
+         jr $ra
 
 # void halt() 
 LHalt:
