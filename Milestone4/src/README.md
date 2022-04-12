@@ -19,7 +19,7 @@ Files that end in .out contain the SPIM output.
 
 Notes:
 - the version of spim used for output, was located at `aycock/411/bin` on the UCalgary CPSC Linux Servers
-- the first line of each .out file can be ignored; it was displayed from redirecting the output of `spim -f <file>.s` to a file (i.e. `~aycock/411/spim -f <file>.s > <file>.out`)
+- the first line of each .out file can be ignored; it was displayed from redirecting the output of `spim -f <file>.s` to a file (i.e. `~aycock/411/binspim -f <file>.s > <file>.out`)
 - for gen.t10.out, I ended the program early because recursive fibonacci takes a while
 - for gen.t13.out, my input during runtime was "hello there racecar"
 - for gen.t18.out, my input during runtime was "12*-8", followed by ENTER, followed by "+"
