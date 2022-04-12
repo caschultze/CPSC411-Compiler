@@ -1033,20 +1033,36 @@ std::string Traversal::genExpr(ASTNode* node) {
         return r;
     }
     if (node->type == "||") {
-        std::string label = "L" + std::to_string(control_labelno++); 
+        /* BEFORE
+        std::string label = "L" + std::to_string(control_labelno++);
         std::string r1 = genExpr(node->children[0]);
         std::string r = registers.allocreg();
         gen_lines.push_back("        move $" + r + ", $" + r1);
-        gen_lines.push_back("        bnez $" + r + ", " + label);
+        gen_lines.push_back("        bnez $" + r + ", " + label); // if LHS is true, skip RHS
         registers.freereg(r1);
         std::string r2 = genExpr(node->children[1]);
         gen_lines.push_back("        move $" + r + ", $" + r2);
         registers.freereg(r2);
         gen_lines.push_back(label + ":");
+        */
+        std::string end_label = "L" + std::to_string(control_labelno++);
+        std::string rhs_label = "L" + std::to_string(control_labelno++);
+        std::string r1 = genExpr(node->children[0]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        move $" + r + ", $" + r1);
+        gen_lines.push_back("        beqz $" + r + ", " + rhs_label);   // if LHS is false, eval RHS.
+        gen_lines.push_back("        j " + end_label);                  // LHS was true, so skip RHS.
+        gen_lines.push_back(rhs_label + ":");                           // RHS
+        registers.freereg(r1);
+        std::string r2 = genExpr(node->children[1]);
+        gen_lines.push_back("        move $" + r + ", $" + r2);         
+        gen_lines.push_back(end_label + ":");                           // || exit
+        registers.freereg(r2);
+
         return r;
     }
     if (node->type == "&&") {
-        std::string label = "L" + std::to_string(control_labelno++); 
+        /*std::string label = "L" + std::to_string(control_labelno++); 
         std::string r1 = genExpr(node->children[0]);
         std::string r = registers.allocreg();
         gen_lines.push_back("        move $" + r + ", $" + r1);
@@ -1055,7 +1071,21 @@ std::string Traversal::genExpr(ASTNode* node) {
         std::string r2 = genExpr(node->children[1]);
         gen_lines.push_back("        move $" + r + ", $" + r2);
         registers.freereg(r2);
-        gen_lines.push_back(label + ":");
+        gen_lines.push_back(label + ":");*/
+        std::string end_label = "L" + std::to_string(control_labelno++);
+        std::string rhs_label = "L" + std::to_string(control_labelno++);
+        std::string r1 = genExpr(node->children[0]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        move $" + r + ", $" + r1);
+        gen_lines.push_back("        bnez $" + r + ", " + rhs_label);   // if LHS is true, eval RHS.
+        gen_lines.push_back("        j " + end_label);                  // LHS was false, so skip RHS.
+        gen_lines.push_back(rhs_label + ":");                           // RHS
+        registers.freereg(r1);
+        std::string r2 = genExpr(node->children[1]);
+        gen_lines.push_back("        move $" + r + ", $" + r2);
+        gen_lines.push_back(end_label + ":");                           // && exit
+        registers.freereg(r2);
+
         return r;
     }
     if (node->type == "funcCall") {
@@ -1131,7 +1161,6 @@ std::string Traversal::genExpr(ASTNode* node) {
     return "Uncaught expression";
 }
 
-
 bool Traversal::genStatement_cb(ASTNode* node) {
 
     if (node->type == "varDecl") {
@@ -1159,7 +1188,7 @@ bool Traversal::genStatement_cb(ASTNode* node) {
     if (node->type == "while") {
         // Children are expression and 'block'
         gen_lines.push_back("# begin while statement");
-        std::string label1 = "L" + std::to_string(control_labelno++);
+        /*std::string label1 = "L" + std::to_string(control_labelno++);
         std::string label2 = "L" + std::to_string(control_labelno++); 
 
         Traversal::while_labels.push(label2);
@@ -1172,7 +1201,27 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         genStatement_cb(node->children[1]);         // Loop body
         gen_lines.push_back("        j "+ label1);
         gen_lines.push_back(label2 + ":");          // Loop exit
+        Traversal::while_labels.pop();*/
+        
+        std::string top_label = "L" + std::to_string(control_labelno++);
+        std::string end_label = "L" + std::to_string(control_labelno++); 
+        std::string body_label = "L" + std::to_string(control_labelno++); 
+
+        Traversal::while_labels.push(end_label);
+        gen_lines.push_back(top_label + ":");          // Loop top
+
+        std::string result_register = genExpr(node->children[0]);
+        
+        gen_lines.push_back("        bnez $" + result_register + ", " + body_label); // if expr is true, do loop body
+        gen_lines.push_back("        j " + end_label);
+        gen_lines.push_back(body_label + ":");          // Loop body
+        registers.freereg(result_register);
+
+        genStatement_cb(node->children[1]);            
+        gen_lines.push_back("        j "+ top_label);
+        gen_lines.push_back(end_label + ":");          // Loop exit
         Traversal::while_labels.pop();
+
 
         gen_lines.push_back("# end while statement");
 
@@ -1202,7 +1251,7 @@ bool Traversal::genStatement_cb(ASTNode* node) {
     if (node->type == "if") {
         // Children are expression and 'block'
         gen_lines.push_back("# begin if statement");
-        std::string result_register = genExpr(node->children[0]);
+        /*std::string result_register = genExpr(node->children[0]);
         // Gen code for branch.
         std::string label = "L" + std::to_string(control_labelno++);
 
@@ -1213,7 +1262,24 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         genStatement_cb(node->children[1]);
 
         // Gen code for label to jump to when test fails.
-        gen_lines.push_back(label + ":");
+        gen_lines.push_back(label + ":");*/
+
+        
+        std::string end_label = "L" + std::to_string(control_labelno++);
+        std::string body_label = "L" + std::to_string(control_labelno++); 
+
+
+        std::string result_register = genExpr(node->children[0]);
+        gen_lines.push_back("        bnez $" + result_register + ", " + body_label);     // if expr is true, do if body
+        gen_lines.push_back("        j " + end_label);
+        gen_lines.push_back(body_label + ":");                  // If body
+        registers.freereg(result_register);
+
+        genStatement_cb(node->children[1]);
+
+        gen_lines.push_back(end_label + ":");                   // If exit
+
+
         gen_lines.push_back("# end if statement");
 
         return true;
@@ -1222,7 +1288,7 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         std::cout << "hello ifElse" << std::endl;
         // Children are expression, 'block', and 'block'
         gen_lines.push_back("# begin ifElse statement");
-        std::string result_register = genExpr(node->children[0]);
+        /*std::string result_register = genExpr(node->children[0]);
         // Gen code for branch.
         std::string label1 = "L" + std::to_string(control_labelno++);
         std::string label2 = "L" + std::to_string(control_labelno++);
@@ -1239,7 +1305,31 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         genStatement_cb(node->children[2]);
 
         // Gen code for label to jump to from if-block
-        gen_lines.push_back(label2 + ":");
+        gen_lines.push_back(label2 + ":");*/
+
+
+        // Children are expression, 'block', and 'block'
+        gen_lines.push_back("# begin ifElse statement");
+        std::string result_register = genExpr(node->children[0]);
+        // Gen code for branch.
+        std::string else_label = "L" + std::to_string(control_labelno++);
+        std::string end_label = "L" + std::to_string(control_labelno++);
+        std::string body_label = "L" + std::to_string(control_labelno++); 
+
+
+        gen_lines.push_back("        bnez $" + result_register + ", " + body_label); // if expr is true, do if body
+        gen_lines.push_back("        j " + else_label);
+        gen_lines.push_back(body_label + ":");                  // If body
+        registers.freereg(result_register);
+
+        genStatement_cb(node->children[1]);
+        gen_lines.push_back("        j " + end_label);
+
+        gen_lines.push_back(else_label + ":");                  // Else body
+        genStatement_cb(node->children[2]);
+
+        // Gen code for label to jump to from if-block
+        gen_lines.push_back(end_label + ":");                   // ifElse exit
         gen_lines.push_back("# end ifElse statement");
 
         return true;

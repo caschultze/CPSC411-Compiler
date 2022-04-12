@@ -1,7 +1,8 @@
 main() {
-	if ((false && false) || false) {
-		prints("If part\n");
+	int i;
+	if (false) {
+		i = 0;
 	} else {
-		prints("else part\n");
+		i = 1;
 	}
 }
