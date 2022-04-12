@@ -2,11 +2,6 @@
 
 
 reg_allocator::reg_allocator() {
-
-    // Use $v0 for return values, do nothing with $v1
-    // Use $s8/$30 as the register to load a string address into
-
-    // Temporary registers (maybe try with 25 instead of 18)
     registers.push_back( std::make_pair("t0", false) );
     registers.push_back( std::make_pair("t1", false) );
     registers.push_back( std::make_pair("t2", false) );
@@ -35,7 +30,6 @@ std::string reg_allocator::allocreg() {
     for (size_t i = 0; i < registers.size(); i++) {
         if (registers[i].second == false) {
             registers[i].second = true;
-            std::cout << "allocated register: " << registers[i].first << std::endl;
             return registers[i].first;
         }
     }
@@ -49,7 +43,6 @@ void reg_allocator::freereg(std::string r) {
     }
     for (size_t i = 0; i < registers.size(); i++) {
         if (registers[i].first == r && registers[i].second == true) {
-            std::cout << "freed register: " << registers[i].first << std::endl;
             registers[i].second = false;
             return;
         }
