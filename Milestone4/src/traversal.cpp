@@ -1209,19 +1209,6 @@ bool Traversal::genStatement_cb(ASTNode* node) {
     if (node->type == "if") {
         // Children are expression and 'block'
         gen_lines.push_back("# begin if statement");
-        /*std::string result_register = genExpr(node->children[0]);
-        // Gen code for branch.
-        std::string label = "L" + std::to_string(control_labelno++);
-
-        gen_lines.push_back("        beqz $" + result_register + ", " + label);
-        registers.freereg(result_register);
-
-        // Gen code for 'block'
-        genStatement_cb(node->children[1]);
-
-        // Gen code for label to jump to when test fails.
-        gen_lines.push_back(label + ":");*/
-
         
         std::string end_label = "L" + std::to_string(control_labelno++);
         std::string body_label = "L" + std::to_string(control_labelno++); 
