@@ -6,7 +6,7 @@ reg_allocator::reg_allocator() {
     // Use $v0 for return values, do nothing with $v1
     // Use $s8/$30 as the register to load a string address into
 
-    // Temporary registers
+    // Temporary registers (maybe try with 25 instead of 18)
     registers.push_back( std::make_pair("t0", false) );
     registers.push_back( std::make_pair("t1", false) );
     registers.push_back( std::make_pair("t2", false) );

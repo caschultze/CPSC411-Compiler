@@ -550,6 +550,7 @@ void Traversal::genRuntimeLibrary() {
     gen_lines.push_back("                        .data");
     gen_lines.push_back("                SGetchar:");
     gen_lines.push_back("                        .space 2");
+    gen_lines.push_back("                        .align 2");
     gen_lines.push_back("         .text");
     gen_lines.push_back("         li $v0, 8");
     gen_lines.push_back("         la $a0, SGetchar");
@@ -689,6 +690,7 @@ bool Traversal::defineGlobVarDeclLabels_cb(ASTNode* node) {
         gen_lines.push_back(node->children[1]->symtab_entry->global_label + ":");
 
         gen_lines.push_back("        .word 0");
+        gen_lines.push_back("        .align 2");
         gen_lines.push_back("        .text");
 
         return true;
@@ -831,8 +833,6 @@ std::string Traversal::genExpr(ASTNode* node) {
     if (node->type == "string") {
         gen_lines.push_back("        .data");
         gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: ");
-        
-        
         int byte_array_len = 0;
         std::string byte_array = "        .byte ";
         bool escape = false;
@@ -1032,6 +1032,32 @@ std::string Traversal::genExpr(ASTNode* node) {
         registers.freereg(r2);
         return r;
     }
+    if (node->type == "||") {
+        std::string label = "L" + std::to_string(control_labelno++); 
+        std::string r1 = genExpr(node->children[0]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        move $" + r + ", $" + r1);
+        gen_lines.push_back("        bnez $" + r + ", " + label);
+        registers.freereg(r1);
+        std::string r2 = genExpr(node->children[1]);
+        gen_lines.push_back("        move $" + r + ", $" + r2);
+        registers.freereg(r2);
+        gen_lines.push_back(label + ":");
+        return r;
+    }
+    if (node->type == "&&") {
+        std::string label = "L" + std::to_string(control_labelno++); 
+        std::string r1 = genExpr(node->children[0]);
+        std::string r = registers.allocreg();
+        gen_lines.push_back("        move $" + r + ", $" + r1);
+        gen_lines.push_back("        beqz $" + r + ", " + label);
+        registers.freereg(r1);
+        std::string r2 = genExpr(node->children[1]);
+        gen_lines.push_back("        move $" + r + ", $" + r2);
+        registers.freereg(r2);
+        gen_lines.push_back(label + ":");
+        return r;
+    }
     if (node->type == "funcCall") {
 
         // 1. Copy args from non-call registers to call registers
@@ -1138,7 +1164,7 @@ bool Traversal::genStatement_cb(ASTNode* node) {
 
         Traversal::while_labels.push(label2);
         gen_lines.push_back(label1 + ":");          // Loop top
-        // todo: gen expression code here. results in 'result register' being populated
+
         std::string result_register = genExpr(node->children[0]);
         gen_lines.push_back("        beqz $" + result_register + ", " + label2);
         registers.freereg(result_register);
@@ -1179,13 +1205,9 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         std::string result_register = genExpr(node->children[0]);
         // Gen code for branch.
         std::string label = "L" + std::to_string(control_labelno++);
-        if (node->children[0]->type == "||" || node->children[0]->type == "&&") {
-            // todo: case for short-circuit logic
-        }
-        else {
-            gen_lines.push_back("        beqz $" + result_register + ", " + label);
-            registers.freereg(result_register);
-        }
+
+        gen_lines.push_back("        beqz $" + result_register + ", " + label);
+        registers.freereg(result_register);
 
         // Gen code for 'block'
         genStatement_cb(node->children[1]);
@@ -1204,14 +1226,10 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         // Gen code for branch.
         std::string label1 = "L" + std::to_string(control_labelno++);
         std::string label2 = "L" + std::to_string(control_labelno++);
-        if (node->children[0]->type == "||" || node->children[0]->type == "&&") {
-            // todo: case for short-circuit logic
-        }
-        else {
-            // expression is 'funcCall', 'true', or 'false'
-            gen_lines.push_back("        beqz $" + result_register + ", " + label1);
-            registers.freereg(result_register);
-        }
+
+        gen_lines.push_back("        beqz $" + result_register + ", " + label1);
+        registers.freereg(result_register);
+
         // Gen code for if-block
         genStatement_cb(node->children[1]);
         gen_lines.push_back("        j " + label2);
@@ -1227,235 +1245,5 @@ bool Traversal::genStatement_cb(ASTNode* node) {
         return true;
     }
     return false;
-    /*
-    std::string r;
-    if (node->type == "return") {
-        std::string r = registers.allocreg();
-        if (node->children.size() > 0) {
-            // bool funcreturnval = true;
-
-            if (node->children[0]->type == "false") {
-                gen_lines.push_back("        li $" + r + ", 0");
-            }
-            if (node->children[0]->type == "true") {
-                gen_lines.push_back("        li $" + r + ", 1");
-            }
-            if (node->children[0]->type == "number") {
-                gen_lines.push_back("        li $" + r + + ", " + node->children[0]->attr);
-            }
-            if (node->children[0]->type == "id") {
-                if (node->children[0]->symtab_entry->global_label != "") {
-                    gen_lines.push_back("        lw $" + r + ", " + node->children[0]->symtab_entry->global_label);
-                }
-                else if (node->children[0]->symtab_entry->stack_address > 0) {
-                    gen_lines.push_back("        lw $" + r + ", " + std::to_string(node->children[0]->symtab_entry->stack_address) + "($sp)");
-                }
-                else {
-                    std::cerr << "Undefined error: trying to load an id that is not global and has no stack address" << std::endl;
-                    exit(1);
-                }
-            }
-            gen_lines.push_back("        move $v0, $" + r);
-            registers.freereg(r);
-        }
-        // need to be aware of what function I am currently in... lets draw a tree to handle this situation & look at the notes
-        gen_lines.push_back("        j " + Traversal::return_label);
-    }
-    if (node->type == "funcCall") {
-
-        ASTNode* actuals = node->children[1];
-        // Load each argument expression into a register.
-        std::vector<std::string> loaded_registers;
-        for (size_t i = 0; i < actuals->children.size(); i++) {
-            std::string r = registers.allocreg();
-            loaded_registers.push_back(r);
-            if (actuals->children[i]->type == "string") {
-                gen_lines.push_back("        .data");
-                gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + "Len: ");
-                gen_lines.push_back("        .word " + std::to_string(actuals->children[i]->attr.size() + 1));
-                gen_lines.push_back("        .align 2");
-
-                gen_lines.push_back("LS" + std::to_string(Traversal::string_labelno) + ": ");
-                std::string byte_array = "        .byte ";
-                // loop
-                int c;
-                bool escape = false;
-                for (size_t z = 0; z < actuals->children[i]->attr.size(); z++) {
-                    c = (int)actuals->children[i]->attr[z];
-                    if (escape == true) {
-                        switch (c) {
-                            case 98:    // '\b'
-                                byte_array.append("8 , ");
-                                escape = false;
-                                break;
-                            case 116:    // '\t'
-                                byte_array.append("9 , ");
-                                escape = false;
-                                break;
-                            case 110:    // '\n'
-                                byte_array.append("10 , ");
-                                escape = false;
-                                break;
-                            case 102:    // '\f'
-                                byte_array.append("12 , ");
-                                escape = false;
-                                break;
-                            case 114:    // '\r'
-                                byte_array.append("13 , ");
-                                escape = false;
-                                break;
-                            case 39:    // '\''
-                                byte_array.append("39 , ");
-                                escape = false;
-                                break;
-                            case 34:    // '\"'
-                                byte_array.append("34 , ");
-                                escape = false;
-                                break;
-                            case 92:    // '\\'
-                                byte_array.append("92 , ");
-                                escape = false;
-                                break;
-                            default:
-                                std::cerr << "error: unsupported escape character" << std::endl;
-                                exit(1);
-                        }
-                        continue;
-                    }
-                    if (c == 92) { 
-                        escape = true;
-                        continue;
-                    }
-                    byte_array.append(std::to_string(c) + " , ");
-                }
-                byte_array.append("0");
-                gen_lines.push_back(byte_array);
-                gen_lines.push_back("        .align 2");
-                gen_lines.push_back("        .text");
-                gen_lines.push_back("        la $" + r + ", LS" + std::to_string(Traversal::string_labelno));
-            }
-            if (actuals->children[i]->type == "false") {
-                //actuals->children[i]->symtab_entry->reg = registers.allocreg();
-                //gen_lines.push_back("        li $" + actuals->children[i]->symtab_entry->reg + ", 0");
-                gen_lines.push_back("        li $" + r + ", 0");
-            }
-            if (actuals->children[i]->type == "true") {
-                //actuals->children[i]->symtab_entry->reg = registers.allocreg();
-                //gen_lines.push_back("        li $" + actuals->children[i]->symtab_entry->reg + ", 1");
-                gen_lines.push_back("        li $" + r + ", 1");
-
-            }
-            if (actuals->children[i]->type == "number") {
-                //actuals->children[i]->symtab_entry->reg = registers.allocreg();
-                //gen_lines.push_back("        li $" + actuals->children[i]->symtab_entry->reg + + ", " + actuals->children[i]->attr);
-                gen_lines.push_back("        li $" + r + ", " + actuals->children[i]->attr);
-            }
-            if (actuals->children[i]->type == "id") {
-                if (actuals->children[i]->symtab_entry->global_label != "") {
-                    // actuals->children[i]->symtab_entry->reg = registers.allocreg();
-                    // gen_lines.push_back("        lw $" + actuals->children[i]->symtab_entry->reg + ", " + actuals->children[i]->symtab_entry->global_label);
-                    gen_lines.push_back("        lw $" + r + ", " + actuals->children[i]->symtab_entry->global_label);
-                }
-                else if (actuals->children[i]->symtab_entry->stack_address > 0) {
-                    // actuals->children[i]->symtab_entry->reg = registers.allocreg();
-                    // gen_lines.push_back("        lw $" + actuals->children[i]->symtab_entry->reg + ", " + std::to_string(actuals->children[i]->symtab_entry->stack_address) + "($sp)");
-                    gen_lines.push_back("        lw $" + r + ", " + std::to_string(actuals->children[i]->symtab_entry->stack_address) + "($sp)");
-                }
-                else {
-                    std::cerr << "Undefined error: trying to load an id that is not global and has no stack address" << std::endl;
-                    exit(1);
-                }
-            }
-        }
-        // Move each allocated register into an argument and free the register.
-        for (size_t i = 0; i < actuals->children.size(); i++) {
-            if (actuals->children[i]->type == "string") {
-                gen_lines.push_back("        move $a" + std::to_string(i) + ", $" + loaded_registers[i]);
-                gen_lines.push_back("        lw $s8, LS" + std::to_string(Traversal::string_labelno++) + "Len");
-                registers.freereg(loaded_registers[i]);
-                continue;
-            }
-            gen_lines.push_back("        move $a" + std::to_string(i) + ", $" + loaded_registers[i]);
-            registers.freereg(loaded_registers[i]);
-        }
-
-        // Generate a 'jal' instruction to the function
-        if (node->children[0]->symtab_entry->prologue_label == "") {
-            if (node->children[0]->attr == "getchar") {
-                gen_lines.push_back("        jal LGetchar");
-            } else if (node->children[0]->attr == "halt") {
-                gen_lines.push_back("        jal LHalt");
-            } else if (node->children[0]->attr == "printb") {
-                gen_lines.push_back("        jal LPrintb");
-            } else if (node->children[0]->attr == "printc") {
-                gen_lines.push_back("        jal LPrintc");
-            } else if (node->children[0]->attr == "printi") {
-                gen_lines.push_back("        jal LPrinti");
-            } else if (node->children[0]->attr == "prints") {
-                gen_lines.push_back("        jal LPrints");
-            }
-        } else {
-            gen_lines.push_back("        jal " + node->children[0]->symtab_entry->prologue_label);
-        }
-        gen_lines.push_back("");
-        
-
-        // Generate code to load result of function call into a register.
-        if (node->children[0]->symtab_entry->return_type == "int" || node->children[0]->symtab_entry->return_type == "boolean") {
-            std::string r = registers.allocreg();
-            gen_lines.push_back("        move $" + r + ", $v0");
-            registers.freereg(r);
-            // TODO: free the register... how do we know which register to free?
-            // If this is the RHS of an '=', then 'r' shoudl be freed after its store instruction.
-        }
-        return true;
-    }
-    if (node->type == "=") {
-
-        // RHS instructions generated first
-        // todo: probably refactor this for more complex expressions (duplicate code in funcCall when loading expressions to populate actuals)
-        std::string r = registers.allocreg();
-        if (node->children[1]->type == "false") {
-            gen_lines.push_back("        li $" + r + ", 0");
-        }
-        if (node->children[1]->type == "true") {
-            gen_lines.push_back("        li $" + r + ", 1");
-        }
-        if (node->children[1]->type == "number") {
-            gen_lines.push_back("        li $" + r + ", " + node->children[1]->attr);
-        }
-        if (node->children[1]->type == "id") {
-            if (node->children[1]->symtab_entry->global_label != "") {
-                gen_lines.push_back("        lw $" + r + ", " + node->children[1]->symtab_entry->global_label);
-            }
-            else if (node->children[1]->symtab_entry->stack_address > 0) {
-                gen_lines.push_back("        lw $" + r + ", " + std::to_string(node->children[1]->symtab_entry->stack_address) + "($sp)");
-            }
-            else {
-                std::cerr << "Undefined error: trying to load an id that is not global and has no stack address" << std::endl;
-                exit(1);
-            }
-        }
-        if (node->children[1]->type == "funcCall") {
-            // TODO (later): consider the case where an 'i = foo(j = foo(12))'
-        }
-        
-        // LHS instructions generated second
-        // - LHS is always either global variable or a local variable.
-        if (node->children[0]->symtab_entry->global_label != "") {
-            gen_lines.push_back("        sw $" + r + ", " + node->children[0]->symtab_entry->global_label);
-        }
-        else if (node->children[0]->symtab_entry->stack_address > 0) {
-            gen_lines.push_back("        sw $" + r + ", " + std::to_string(node->children[0]->symtab_entry->stack_address) + "($sp)");
-        }
-        else {
-            std::cerr << "Undefined error: LHS of = is has not global and has no stack address" << std::endl;
-            exit(1);
-        }
-        registers.freereg(r);
-
-        return true;
-    } 
-    return false;*/
 }
 

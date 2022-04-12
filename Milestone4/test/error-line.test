@@ -1,3 +1,4 @@
+# gen-art-life.test asm, with line 1527
                     .text
                     .globl main
             main:
@@ -7,1012 +8,810 @@
         .data
 G0:
         .word 0
-        .align 2
         .text
         .data
 G1:
         .word 0
-        .align 2
         .text
         .data
 G2:
         .word 0
-        .align 2
         .text
         .data
 G3:
         .word 0
-        .align 2
         .text
         .data
 G4:
         .word 0
-        .align 2
         .text
         .data
 G5:
         .word 0
-        .align 2
         .text
         .data
 G6:
         .word 0
-        .align 2
         .text
         .data
 G7:
         .word 0
-        .align 2
         .text
         .data
 G8:
         .word 0
-        .align 2
         .text
         .data
 G9:
         .word 0
-        .align 2
         .text
         .data
 G10:
         .word 0
-        .align 2
         .text
         .data
 G11:
         .word 0
-        .align 2
         .text
         .data
 G12:
         .word 0
-        .align 2
         .text
         .data
 G13:
         .word 0
-        .align 2
         .text
         .data
 G14:
         .word 0
-        .align 2
         .text
         .data
 G15:
         .word 0
-        .align 2
         .text
         .data
 G16:
         .word 0
-        .align 2
         .text
         .data
 G17:
         .word 0
-        .align 2
         .text
         .data
 G18:
         .word 0
-        .align 2
         .text
         .data
 G19:
         .word 0
-        .align 2
         .text
         .data
 G20:
         .word 0
-        .align 2
         .text
         .data
 G21:
         .word 0
-        .align 2
         .text
         .data
 G22:
         .word 0
-        .align 2
         .text
         .data
 G23:
         .word 0
-        .align 2
         .text
         .data
 G24:
         .word 0
-        .align 2
         .text
         .data
 G25:
         .word 0
-        .align 2
         .text
         .data
 G26:
         .word 0
-        .align 2
         .text
         .data
 G27:
         .word 0
-        .align 2
         .text
         .data
 G28:
         .word 0
-        .align 2
         .text
         .data
 G29:
         .word 0
-        .align 2
         .text
         .data
 G30:
         .word 0
-        .align 2
         .text
         .data
 G31:
         .word 0
-        .align 2
         .text
         .data
 G32:
         .word 0
-        .align 2
         .text
         .data
 G33:
         .word 0
-        .align 2
         .text
         .data
 G34:
         .word 0
-        .align 2
         .text
         .data
 G35:
         .word 0
-        .align 2
         .text
         .data
 G36:
         .word 0
-        .align 2
         .text
         .data
 G37:
         .word 0
-        .align 2
         .text
         .data
 G38:
         .word 0
-        .align 2
         .text
         .data
 G39:
         .word 0
-        .align 2
         .text
         .data
 G40:
         .word 0
-        .align 2
         .text
         .data
 G41:
         .word 0
-        .align 2
         .text
         .data
 G42:
         .word 0
-        .align 2
         .text
         .data
 G43:
         .word 0
-        .align 2
         .text
         .data
 G44:
         .word 0
-        .align 2
         .text
         .data
 G45:
         .word 0
-        .align 2
         .text
         .data
 G46:
         .word 0
-        .align 2
         .text
         .data
 G47:
         .word 0
-        .align 2
         .text
         .data
 G48:
         .word 0
-        .align 2
         .text
         .data
 G49:
         .word 0
-        .align 2
         .text
         .data
 G50:
         .word 0
-        .align 2
         .text
         .data
 G51:
         .word 0
-        .align 2
         .text
         .data
 G52:
         .word 0
-        .align 2
         .text
         .data
 G53:
         .word 0
-        .align 2
         .text
         .data
 G54:
         .word 0
-        .align 2
         .text
         .data
 G55:
         .word 0
-        .align 2
         .text
         .data
 G56:
         .word 0
-        .align 2
         .text
         .data
 G57:
         .word 0
-        .align 2
         .text
         .data
 G58:
         .word 0
-        .align 2
         .text
         .data
 G59:
         .word 0
-        .align 2
         .text
         .data
 G60:
         .word 0
-        .align 2
         .text
         .data
 G61:
         .word 0
-        .align 2
         .text
         .data
 G62:
         .word 0
-        .align 2
         .text
         .data
 G63:
         .word 0
-        .align 2
         .text
         .data
 G64:
         .word 0
-        .align 2
         .text
         .data
 G65:
         .word 0
-        .align 2
         .text
         .data
 G66:
         .word 0
-        .align 2
         .text
         .data
 G67:
         .word 0
-        .align 2
         .text
         .data
 G68:
         .word 0
-        .align 2
         .text
         .data
 G69:
         .word 0
-        .align 2
         .text
         .data
 G70:
         .word 0
-        .align 2
         .text
         .data
 G71:
         .word 0
-        .align 2
         .text
         .data
 G72:
         .word 0
-        .align 2
         .text
         .data
 G73:
         .word 0
-        .align 2
         .text
         .data
 G74:
         .word 0
-        .align 2
         .text
         .data
 G75:
         .word 0
-        .align 2
         .text
         .data
 G76:
         .word 0
-        .align 2
         .text
         .data
 G77:
         .word 0
-        .align 2
         .text
         .data
 G78:
         .word 0
-        .align 2
         .text
         .data
 G79:
         .word 0
-        .align 2
         .text
         .data
 G80:
         .word 0
-        .align 2
         .text
         .data
 G81:
         .word 0
-        .align 2
         .text
         .data
 G82:
         .word 0
-        .align 2
         .text
         .data
 G83:
         .word 0
-        .align 2
         .text
         .data
 G84:
         .word 0
-        .align 2
         .text
         .data
 G85:
         .word 0
-        .align 2
         .text
         .data
 G86:
         .word 0
-        .align 2
         .text
         .data
 G87:
         .word 0
-        .align 2
         .text
         .data
 G88:
         .word 0
-        .align 2
         .text
         .data
 G89:
         .word 0
-        .align 2
         .text
         .data
 G90:
         .word 0
-        .align 2
         .text
         .data
 G91:
         .word 0
-        .align 2
         .text
         .data
 G92:
         .word 0
-        .align 2
         .text
         .data
 G93:
         .word 0
-        .align 2
         .text
         .data
 G94:
         .word 0
-        .align 2
         .text
         .data
 G95:
         .word 0
-        .align 2
         .text
         .data
 G96:
         .word 0
-        .align 2
         .text
         .data
 G97:
         .word 0
-        .align 2
         .text
         .data
 G98:
         .word 0
-        .align 2
         .text
         .data
 G99:
         .word 0
-        .align 2
         .text
         .data
 G100:
         .word 0
-        .align 2
         .text
         .data
 G101:
         .word 0
-        .align 2
         .text
         .data
 G102:
         .word 0
-        .align 2
         .text
         .data
 G103:
         .word 0
-        .align 2
         .text
         .data
 G104:
         .word 0
-        .align 2
         .text
         .data
 G105:
         .word 0
-        .align 2
         .text
         .data
 G106:
         .word 0
-        .align 2
         .text
         .data
 G107:
         .word 0
-        .align 2
         .text
         .data
 G108:
         .word 0
-        .align 2
         .text
         .data
 G109:
         .word 0
-        .align 2
         .text
         .data
 G110:
         .word 0
-        .align 2
         .text
         .data
 G111:
         .word 0
-        .align 2
         .text
         .data
 G112:
         .word 0
-        .align 2
         .text
         .data
 G113:
         .word 0
-        .align 2
         .text
         .data
 G114:
         .word 0
-        .align 2
         .text
         .data
 G115:
         .word 0
-        .align 2
         .text
         .data
 G116:
         .word 0
-        .align 2
         .text
         .data
 G117:
         .word 0
-        .align 2
         .text
         .data
 G118:
         .word 0
-        .align 2
         .text
         .data
 G119:
         .word 0
-        .align 2
         .text
         .data
 G120:
         .word 0
-        .align 2
         .text
         .data
 G121:
         .word 0
-        .align 2
         .text
         .data
 G122:
         .word 0
-        .align 2
         .text
         .data
 G123:
         .word 0
-        .align 2
         .text
         .data
 G124:
         .word 0
-        .align 2
         .text
         .data
 G125:
         .word 0
-        .align 2
         .text
         .data
 G126:
         .word 0
-        .align 2
         .text
         .data
 G127:
         .word 0
-        .align 2
         .text
         .data
 G128:
         .word 0
-        .align 2
         .text
         .data
 G129:
         .word 0
-        .align 2
         .text
         .data
 G130:
         .word 0
-        .align 2
         .text
         .data
 G131:
         .word 0
-        .align 2
         .text
         .data
 G132:
         .word 0
-        .align 2
         .text
         .data
 G133:
         .word 0
-        .align 2
         .text
         .data
 G134:
         .word 0
-        .align 2
         .text
         .data
 G135:
         .word 0
-        .align 2
         .text
         .data
 G136:
         .word 0
-        .align 2
         .text
         .data
 G137:
         .word 0
-        .align 2
         .text
         .data
 G138:
         .word 0
-        .align 2
         .text
         .data
 G139:
         .word 0
-        .align 2
         .text
         .data
 G140:
         .word 0
-        .align 2
         .text
         .data
 G141:
         .word 0
-        .align 2
         .text
         .data
 G142:
         .word 0
-        .align 2
         .text
         .data
 G143:
         .word 0
-        .align 2
         .text
         .data
 G144:
         .word 0
-        .align 2
         .text
         .data
 G145:
         .word 0
-        .align 2
         .text
         .data
 G146:
         .word 0
-        .align 2
         .text
         .data
 G147:
         .word 0
-        .align 2
         .text
         .data
 G148:
         .word 0
-        .align 2
         .text
         .data
 G149:
         .word 0
-        .align 2
         .text
         .data
 G150:
         .word 0
-        .align 2
         .text
         .data
 G151:
         .word 0
-        .align 2
         .text
         .data
 G152:
         .word 0
-        .align 2
         .text
         .data
 G153:
         .word 0
-        .align 2
         .text
         .data
 G154:
         .word 0
-        .align 2
         .text
         .data
 G155:
         .word 0
-        .align 2
         .text
         .data
 G156:
         .word 0
-        .align 2
         .text
         .data
 G157:
         .word 0
-        .align 2
         .text
         .data
 G158:
         .word 0
-        .align 2
         .text
         .data
 G159:
         .word 0
-        .align 2
         .text
         .data
 G160:
         .word 0
-        .align 2
         .text
         .data
 G161:
         .word 0
-        .align 2
         .text
         .data
 G162:
         .word 0
-        .align 2
         .text
         .data
 G163:
         .word 0
-        .align 2
         .text
         .data
 G164:
         .word 0
-        .align 2
         .text
         .data
 G165:
         .word 0
-        .align 2
         .text
         .data
 G166:
         .word 0
-        .align 2
         .text
         .data
 G167:
         .word 0
-        .align 2
         .text
         .data
 G168:
         .word 0
-        .align 2
         .text
         .data
 G169:
         .word 0
-        .align 2
         .text
         .data
 G170:
         .word 0
-        .align 2
         .text
         .data
 G171:
         .word 0
-        .align 2
         .text
         .data
 G172:
         .word 0
-        .align 2
         .text
         .data
 G173:
         .word 0
-        .align 2
         .text
         .data
 G174:
         .word 0
-        .align 2
         .text
         .data
 G175:
         .word 0
-        .align 2
         .text
         .data
 G176:
         .word 0
-        .align 2
         .text
         .data
 G177:
         .word 0
-        .align 2
         .text
         .data
 G178:
         .word 0
-        .align 2
         .text
         .data
 G179:
         .word 0
-        .align 2
         .text
         .data
 G180:
         .word 0
-        .align 2
         .text
         .data
 G181:
         .word 0
-        .align 2
         .text
         .data
 G182:
         .word 0
-        .align 2
         .text
         .data
 G183:
         .word 0
-        .align 2
         .text
         .data
 G184:
         .word 0
-        .align 2
         .text
         .data
 G185:
         .word 0
-        .align 2
         .text
         .data
 G186:
         .word 0
-        .align 2
         .text
         .data
 G187:
         .word 0
-        .align 2
         .text
         .data
 G188:
         .word 0
-        .align 2
         .text
         .data
 G189:
         .word 0
-        .align 2
         .text
         .data
 G190:
         .word 0
-        .align 2
         .text
         .data
 G191:
         .word 0
-        .align 2
         .text
         .data
 G192:
         .word 0
-        .align 2
         .text
         .data
 G193:
         .word 0
-        .align 2
         .text
         .data
 G194:
         .word 0
-        .align 2
         .text
         .data
 G195:
         .word 0
-        .align 2
         .text
         .data
 G196:
         .word 0
-        .align 2
         .text
         .data
 G197:
         .word 0
-        .align 2
         .text
         .data
 G198:
         .word 0
-        .align 2
         .text
         .data
 G199:
         .word 0
-        .align 2
         .text
         .data
 G200:
         .word 0
-        .align 2
         .text
         .data
 G201:
         .word 0
-        .align 2
         .text
 P0:
         subu $sp, $sp, 20
@@ -8406,20 +8205,18 @@ L857:
         move $t0, $t3
 L869:
         beqz $t0, L870
+# begin stmtExpr
+        li $t0, 1
+        sw $t0, G158
+# end stmtExpr
         j L871
 L870:
+# begin stmtExpr
+#        li $t0, 0 # error occurs here
+#        sw $t0, G158
+# end stmtExpr
 L871:
 # end ifElse statement
-# begin stmtExpr
-        li $t0, 0
-        move $a0, $t0
-        jal LPrinti
-
-# end stmtExpr
-# begin stmtExpr
-        li $t0, 0
-        sw $t0, 16($sp)
-# end stmtExpr
         j L868
 L867:
 L868:
